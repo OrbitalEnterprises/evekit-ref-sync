@@ -127,6 +127,7 @@ public abstract class AbstractRefSync implements RefSynchronizationHandler {
 
       // Finished sync, store result if needed
       syncUtil.storeSynchResults(time, status, errorDetail, nextExpiry, description, updateList, this);
+      log.fine("Completed storing results for " + description);
       return SyncStatus.DONE;
 
     } catch (IOException e) {

@@ -16,7 +16,7 @@ import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 public class RefSynchronizerUtil {
   protected static final Logger log               = Logger.getLogger(RefSynchronizerUtil.class.getName());
 
-  public static final int       COMMIT_BATCH_SIZE = 200;
+  public static final int       COMMIT_BATCH_SIZE = 5000;
 
   public static enum SyncStatus {
                                  CONTINUE,
@@ -270,6 +270,7 @@ public class RefSynchronizerUtil {
     tracker = getSetup.getTracker();
     container = getSetup.getContainer();
     if (toStore != null && toStore.size() > 0) {
+      log.fine("Processing " + toStore.size() + " total updates");
       for (int i = 0, endIndex = Math.min(i + COMMIT_BATCH_SIZE, toStore.size()); i < toStore.size(); i = endIndex, endIndex = Math.min(i + COMMIT_BATCH_SIZE,
                                                                                                                                         toStore.size())) {
         commitBlock.setParams(tracker, container, toStore.subList(i, endIndex));
