@@ -16,7 +16,7 @@ import enterprises.orbital.evekit.account.EveKitUserAccountProvider;
 public class RefSynchronizerUtil {
   protected static final Logger log               = Logger.getLogger(RefSynchronizerUtil.class.getName());
 
-  public static final int       COMMIT_BATCH_SIZE = 5000;
+  public static final int       COMMIT_BATCH_SIZE = 200;
 
   public static enum SyncStatus {
                                  CONTINUE,

@@ -1,5 +1,16 @@
 package enterprises.orbital.evekit.model;
 
+import enterprises.orbital.base.OrbitalProperties;
+import enterprises.orbital.base.PersistentProperty;
+import enterprises.orbital.evekit.model.RefSynchronizerUtil.SyncStatus;
+import enterprises.orbital.evekit.model.eve.sync.*;
+import enterprises.orbital.evekit.model.map.sync.FacWarSystemsSync;
+import enterprises.orbital.evekit.model.map.sync.SovereigntySync;
+import enterprises.orbital.evekit.model.server.sync.ServerStatusSync;
+import enterprises.orbital.evexmlapi.EveXmlApiAdapter;
+import enterprises.orbital.evexmlapi.EveXmlApiConfig;
+import enterprises.orbital.evexmlapi.IEveXmlApi;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -9,26 +20,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import enterprises.orbital.base.OrbitalProperties;
-import enterprises.orbital.base.PersistentProperty;
-import enterprises.orbital.evekit.model.RefSynchronizerUtil.SyncStatus;
-import enterprises.orbital.evekit.model.calls.sync.CallListSync;
-import enterprises.orbital.evekit.model.eve.sync.AllianceSync;
-import enterprises.orbital.evekit.model.eve.sync.ConquerableStationsSync;
-import enterprises.orbital.evekit.model.eve.sync.ErrorsSync;
-import enterprises.orbital.evekit.model.eve.sync.FacWarStatsSync;
-import enterprises.orbital.evekit.model.eve.sync.FacWarTopStatsSync;
-import enterprises.orbital.evekit.model.eve.sync.RefTypeSync;
-import enterprises.orbital.evekit.model.eve.sync.SkillTreeSync;
-import enterprises.orbital.evekit.model.map.sync.FacWarSystemsSync;
-import enterprises.orbital.evekit.model.map.sync.MapJumpSync;
-import enterprises.orbital.evekit.model.map.sync.MapKillSync;
-import enterprises.orbital.evekit.model.map.sync.SovereigntySync;
-import enterprises.orbital.evekit.model.server.sync.ServerStatusSync;
-import enterprises.orbital.evexmlapi.EveXmlApiAdapter;
-import enterprises.orbital.evexmlapi.EveXmlApiConfig;
-import enterprises.orbital.evexmlapi.IEveXmlApi;
 
 /**
  * Reference data synchronizer class. There should only ever be one reference data synchronizer operating at any given time. During synchronization,
@@ -260,30 +251,6 @@ public class RefDataSynchronizer {
 
     });
 
-    supportedFeatures.put(SynchronizationState.SYNC_REF_CALLS_LIST, new RefStateHandler() {
-
-      @Override
-      public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
-        return CallListSync.exclude(syncUtil);
-      }
-
-      @Override
-      public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
-        return CallListSync.notAllowed(syncUtil);
-      }
-
-      @Override
-      public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
-        return CallListSync.sync(syncTime, syncUtil, apiHandle.getApiAPIService());
-      }
-
-    });
-
     supportedFeatures.put(SynchronizationState.SYNC_REF_ALLIANCES, new RefStateHandler() {
 
       @Override
@@ -328,30 +295,6 @@ public class RefDataSynchronizer {
                              RefSynchronizerUtil syncUtil,
                              IEveXmlApi apiHandle) {
         return ConquerableStationsSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
-      }
-
-    });
-
-    supportedFeatures.put(SynchronizationState.SYNC_REF_ERRORLIST, new RefStateHandler() {
-
-      @Override
-      public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
-        return ErrorsSync.exclude(syncUtil);
-      }
-
-      @Override
-      public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
-        return ErrorsSync.notAllowed(syncUtil);
-      }
-
-      @Override
-      public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
-        return ErrorsSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
       }
 
     });
@@ -404,30 +347,6 @@ public class RefDataSynchronizer {
 
     });
 
-    supportedFeatures.put(SynchronizationState.SYNC_REF_REFTYPES, new RefStateHandler() {
-
-      @Override
-      public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
-        return RefTypeSync.exclude(syncUtil);
-      }
-
-      @Override
-      public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
-        return RefTypeSync.notAllowed(syncUtil);
-      }
-
-      @Override
-      public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
-        return RefTypeSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
-      }
-
-    });
-
     supportedFeatures.put(SynchronizationState.SYNC_REF_SKILLTREE, new RefStateHandler() {
 
       @Override
@@ -472,54 +391,6 @@ public class RefDataSynchronizer {
                              RefSynchronizerUtil syncUtil,
                              IEveXmlApi apiHandle) {
         return FacWarSystemsSync.sync(syncTime, syncUtil, apiHandle.getMapAPIService());
-      }
-
-    });
-
-    supportedFeatures.put(SynchronizationState.SYNC_REF_MAPJUMPS, new RefStateHandler() {
-
-      @Override
-      public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
-        return MapJumpSync.exclude(syncUtil);
-      }
-
-      @Override
-      public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
-        return MapJumpSync.notAllowed(syncUtil);
-      }
-
-      @Override
-      public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
-        return MapJumpSync.sync(syncTime, syncUtil, apiHandle.getMapAPIService());
-      }
-
-    });
-
-    supportedFeatures.put(SynchronizationState.SYNC_REF_MAPKILLS, new RefStateHandler() {
-
-      @Override
-      public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
-        return MapKillSync.exclude(syncUtil);
-      }
-
-      @Override
-      public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
-        return MapKillSync.notAllowed(syncUtil);
-      }
-
-      @Override
-      public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
-        return MapKillSync.sync(syncTime, syncUtil, apiHandle.getMapAPIService());
       }
 
     });
