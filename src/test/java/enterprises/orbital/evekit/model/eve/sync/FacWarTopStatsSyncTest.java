@@ -734,42 +734,42 @@ public class FacWarTopStatsSyncTest extends RefTestBase {
           (StatAttribute) charKillStatTestData[i][0], (Integer) charKillStatTestData[i][1] + 1,
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (Long) charKillStatTestData[i][2], (String) charKillStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < charVPStatTestData.length; i++) {
       CharacterVictoryPointStat newStat = new CharacterVictoryPointStat(
           (StatAttribute) charVPStatTestData[i][0], (Integer) charVPStatTestData[i][1] + 1,
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (Long) charVPStatTestData[i][2], (String) charVPStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < corpKillStatTestData.length; i++) {
       CorporationKillStat newStat = new CorporationKillStat(
           (StatAttribute) corpKillStatTestData[i][0], (Integer) corpKillStatTestData[i][1] + 1,
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (Long) corpKillStatTestData[i][2], (String) corpKillStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < corpVPStatTestData.length; i++) {
       CorporationVictoryPointStat newStat = new CorporationVictoryPointStat(
           (StatAttribute) corpVPStatTestData[i][0], (Integer) corpVPStatTestData[i][1] + 1,
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (Long) corpVPStatTestData[i][2], (String) corpVPStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < facKillStatTestData.length; i++) {
       FactionKillStat newStat = new FactionKillStat(
           (StatAttribute) facKillStatTestData[i][0], (Integer) facKillStatTestData[i][1] + 1,
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (Long) facKillStatTestData[i][2], (String) facKillStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < facVPStatTestData.length; i++) {
       FactionVictoryPointStat newStat = new FactionVictoryPointStat(
           (StatAttribute) facVPStatTestData[i][0], (Integer) facVPStatTestData[i][1] + 1,
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (Long) facVPStatTestData[i][2], (String) facVPStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
 
     // Perform the sync
@@ -952,42 +952,42 @@ public class FacWarTopStatsSyncTest extends RefTestBase {
           (StatAttribute) charKillStatTestData[i][0], (Integer) charKillStatTestData[i][1] + 1, (Long) charKillStatTestData[i][2] + 1,
           (String) charKillStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < charVPStatTestData.length; i++) {
       CharacterVictoryPointStat newStat = new CharacterVictoryPointStat(
           (StatAttribute) charVPStatTestData[i][0], (Integer) charVPStatTestData[i][1] + 1, (Long) charVPStatTestData[i][2] + 1,
           (String) charVPStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < corpKillStatTestData.length; i++) {
       CorporationKillStat newStat = new CorporationKillStat(
           (StatAttribute) corpKillStatTestData[i][0], (Integer) corpKillStatTestData[i][1] + 1, (Long) corpKillStatTestData[i][2] + 1,
           (String) corpKillStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < corpVPStatTestData.length; i++) {
       CorporationVictoryPointStat newStat = new CorporationVictoryPointStat(
           (StatAttribute) corpVPStatTestData[i][0], (Integer) corpVPStatTestData[i][1] + 1, (Long) corpVPStatTestData[i][2] + 1,
           (String) corpVPStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < facKillStatTestData.length; i++) {
       FactionKillStat newStat = new FactionKillStat(
           (StatAttribute) facKillStatTestData[i][0], (Integer) facKillStatTestData[i][1] + 1, (Long) facKillStatTestData[i][2] + 1,
           (String) facKillStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
     for (int i = 0; i < facVPStatTestData.length; i++) {
       FactionVictoryPointStat newStat = new FactionVictoryPointStat(
           (StatAttribute) facVPStatTestData[i][0], (Integer) facVPStatTestData[i][1] + 1, (Long) facVPStatTestData[i][2] + 1,
           (String) facVPStatTestData[i][3] + "1");
       newStat.setup(testTime - 1);
-      RefCachedData.updateData(newStat);
+      RefCachedData.update(newStat);
     }
 
     // Set the tracker as already updated and populate the container
@@ -995,7 +995,7 @@ public class FacWarTopStatsSyncTest extends RefTestBase {
     tracker.setFacWarTopStatsDetail(null);
     tracker = RefSyncTracker.updateTracker(tracker);
     container.setFacWarTopStatsExpiry(prevDate);
-    container = RefCachedData.updateData(container);
+    container = RefCachedData.update(container);
 
     // Perform the sync
     SyncStatus syncOutcome = FacWarTopStatsSync.sync(testTime, syncUtil, mockServer);

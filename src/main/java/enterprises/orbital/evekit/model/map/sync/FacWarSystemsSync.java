@@ -48,9 +48,9 @@ public class FacWarSystemsSync extends AbstractRefSync {
   @Override
   public void updateExpiry(
                            RefData container,
-                           long expiry) {
+                           long expiry) throws IOException {
     container.setFacWarSystemsExpiry(expiry);
-    RefCachedData.updateData(container);
+    RefCachedData.update(container);
   }
 
   @Override
@@ -58,7 +58,7 @@ public class FacWarSystemsSync extends AbstractRefSync {
                         long time,
                         RefSyncTracker tracker,
                         RefData container,
-                        RefCachedData item) {
+                        RefCachedData item) throws IOException {
 
     if (item instanceof FactionWarSystem) {
       FactionWarSystem api = (FactionWarSystem) item;

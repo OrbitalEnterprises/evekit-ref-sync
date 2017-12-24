@@ -198,7 +198,7 @@ public class SovereigntySyncTest extends RefTestBase {
           (Long) sovTestData[i][0] + 1, (Long) sovTestData[i][1] + 1, (Long) sovTestData[i][2] + 1,
           i % 2 == 0 ? TestBase.getUniqueRandomInteger() : (Integer) sovTestData[i][3], sovTestData[i][4] + "1");
       newSov.setup(testTime - 1);
-      RefCachedData.updateData(newSov);
+      RefCachedData.update(newSov);
     }
 
     // Perform the sync
@@ -248,7 +248,7 @@ public class SovereigntySyncTest extends RefTestBase {
       Sovereignty newSov = new Sovereignty(
           (Long) sovTestData[i][0] + 1, (Long) sovTestData[i][1] + 1, (Long) sovTestData[i][2] + 1, (Integer) sovTestData[i][3] + 1, sovTestData[i][4] + "1");
       newSov.setup(testTime - 1);
-      RefCachedData.updateData(newSov);
+      RefCachedData.update(newSov);
     }
 
     // Set the tracker as already updated and populate the container
@@ -256,7 +256,7 @@ public class SovereigntySyncTest extends RefTestBase {
     tracker.setSovereigntyDetail(null);
     tracker = RefSyncTracker.updateTracker(tracker);
     container.setSovereigntyExpiry(prevDate);
-    container = RefCachedData.updateData(container);
+    container = RefCachedData.update(container);
 
     // Perform the sync
     SyncStatus syncOutcome = SovereigntySync.sync(testTime, syncUtil, mockServer);

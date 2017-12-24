@@ -218,7 +218,7 @@ public class ConquerableStationsSyncTest extends RefTestBase {
           (Integer) conqStationTestData[i][5] + 1, (Long) conqStationTestData[i][6] + 1, (Long) conqStationTestData[i][7] + 1,
           (Long) conqStationTestData[i][8] + 1);
       newStation.setup(testTime - 1);
-      RefCachedData.updateData(newStation);
+      RefCachedData.update(newStation);
     }
 
     // Perform the sync
@@ -275,7 +275,7 @@ public class ConquerableStationsSyncTest extends RefTestBase {
           conqStationTestData[i][4] + "1", (Integer) conqStationTestData[i][5] + 1, (Long) conqStationTestData[i][6] + 1, (Long) conqStationTestData[i][7] + 1,
           (Long) conqStationTestData[i][8] + 1);
       newStation.setup(testTime - 1);
-      RefCachedData.updateData(newStation);
+      RefCachedData.update(newStation);
     }
 
     // Set the tracker as already updated and populate the container
@@ -283,7 +283,7 @@ public class ConquerableStationsSyncTest extends RefTestBase {
     tracker.setConquerableStationsDetail(null);
     tracker = RefSyncTracker.updateTracker(tracker);
     container.setConquerableStationsExpiry(prevDate);
-    container = RefCachedData.updateData(container);
+    container = RefCachedData.update(container);
 
     // Perform the sync
     SyncStatus syncOutcome = ConquerableStationsSync.sync(testTime, syncUtil, mockServer);

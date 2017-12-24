@@ -6,7 +6,6 @@ import enterprises.orbital.evekit.model.RefSynchronizerUtil.SyncStatus;
 import enterprises.orbital.evekit.model.eve.sync.*;
 import enterprises.orbital.evekit.model.map.sync.FacWarSystemsSync;
 import enterprises.orbital.evekit.model.map.sync.SovereigntySync;
-import enterprises.orbital.evekit.model.server.sync.ServerStatusSync;
 import enterprises.orbital.evexmlapi.EveXmlApiAdapter;
 import enterprises.orbital.evexmlapi.EveXmlApiConfig;
 import enterprises.orbital.evexmlapi.IEveXmlApi;
@@ -24,7 +23,7 @@ import java.util.logging.Logger;
 /**
  * Reference data synchronizer class. There should only ever be one reference data synchronizer operating at any given time. During synchronization,
  * synchronizers perform the following actions:
- * 
+ * <p>
  * <ol>
  * <li>Verify synchronization is not stuck. If an unfinished synchronizer exists but has been open for too long. Then it is finished immediately.
  * <li>Verify enough time has passed since the last synchronization. If not enough time has passed, then synchronization is skipped.
@@ -33,55 +32,56 @@ import java.util.logging.Logger;
  * </ol>
  */
 public class RefDataSynchronizer {
-  protected static final Logger log                          = Logger.getLogger(RefDataSynchronizer.class.getName());
+  protected static final Logger log = Logger.getLogger(RefDataSynchronizer.class.getName());
 
   // List of states we should skip during synchronization (separate with '|')
-  public static final String    PROP_SKIP_SYNC               = "enterprises.orbital.evekit.ref.skip_sync";
-  // Minimum number of milliseconds that must elapse between attempts to synchronize reference data
-  public static final String    PROP_SYNC_ATTEMPT_SEPARATION = "enterprises.orbital.evekit.ref.sync_attempt_separation";
+  public static final String PROP_SKIP_SYNC = "enterprises.orbital.evekit.ref.skip_sync";
+  // Minimum number of milliseconds that must elapse between attempts to synch reference data
+  public static final String PROP_SYNC_ATTEMPT_SEPARATION = "enterprises.orbital.evekit.ref.sync_attempt_separation";
   // Maximum number of milliseconds a tracker is allowed to remain unfinished
-  public static final String    PROP_SYNC_TERM_DELAY         = "enterprises.orbital.evekit.ref.sync_terminate_delay";
+  public static final String PROP_SYNC_TERM_DELAY = "enterprises.orbital.evekit.ref.sync_terminate_delay";
   // XML API server connection timeout max (milliseconds)
-  public static final String    PROP_CONNECT_TIMEOUT         = "enterprises.orbital.evekit.timeout.connect";
+  public static final String PROP_CONNECT_TIMEOUT = "enterprises.orbital.evekit.timeout.connect";
   // XML API server connection read timeout max (milliseconds)
-  public static final String    PROP_READ_TIMEOUT            = "enterprises.orbital.evekit.timeout.read";
+  public static final String PROP_READ_TIMEOUT = "enterprises.orbital.evekit.timeout.read";
   // Agent to set for all XML API requests
-  public static final String    PROP_SITE_AGENT              = "enterprises.orbital.evekit.site_agent";
+  public static final String PROP_SITE_AGENT = "enterprises.orbital.evekit.site_agent";
   // XML API URL to use
-  public static final String    PROP_XML_API_URL             = "enterprises.orbital.evekit.api_server_url";
+  public static final String PROP_XML_API_URL = "enterprises.orbital.evekit.api_server_url";
 
   public static interface RefStateHandler {
     public SyncStatus exclude(
-                              RefSynchronizerUtil syncUtil);
+        RefSynchronizerUtil syncUtil);
 
     public SyncStatus notAllowed(
-                                 RefSynchronizerUtil syncUtil);
+        RefSynchronizerUtil syncUtil);
 
     public SyncStatus sync(
-                           long syncTime,
-                           RefSynchronizerUtil syncUtil,
-                           IEveXmlApi apiHandle);
+        long syncTime,
+        RefSynchronizerUtil syncUtil,
+        IEveXmlApi apiHandle);
   }
 
   /**
    * Retrieve the synchronization states that have been excluded from synchronization by the admin.
-   * 
+   *
    * @return the set of excluded synchronization states.
    */
   protected static Set<SynchronizationState> getExcludedStates() {
-    String[] excludedStates = PersistentProperty.getPropertyWithFallback(RefDataSynchronizer.PROP_SKIP_SYNC, "").split("\\|");
+    String[] excludedStates = PersistentProperty.getPropertyWithFallback(RefDataSynchronizer.PROP_SKIP_SYNC, "")
+                                                .split("\\|");
     Set<SynchronizationState> excluded = new HashSet<SynchronizationState>();
     for (String next : excludedStates) {
       try {
         if (!next.isEmpty()) {
           SynchronizationState val = SynchronizationState.valueOf(next);
           switch (val) {
-          case SYNC_REF_START:
-          case SYNC_REF_END:
-            log.warning("Not allowed to exclude start or stop states, ignoring: " + val);
-            break;
-          default:
-            excluded.add(val);
+            case SYNC_REF_START:
+            case SYNC_REF_END:
+              log.warning("Not allowed to exclude start or stop states, ignoring: " + val);
+              break;
+            default:
+              excluded.add(val);
           }
         }
       } catch (Exception e) {
@@ -94,22 +94,25 @@ public class RefDataSynchronizer {
 
   /**
    * Retrieve an XML endpoint handle using global configuration properties.
-   * 
+   *
    * @return an XML API endpoint handle
-   * @throws URISyntaxException
-   *           if a config error prevents the creation of the handle
+   * @throws URISyntaxException if a config error prevents the creation of the handle
    */
   public static IEveXmlApi getApiHandle() throws URISyntaxException {
     String agentValue = OrbitalProperties.getGlobalProperty(RefDataSynchronizer.PROP_SITE_AGENT, "unknown-agent");
     int connectTimeout = (int) OrbitalProperties.getLongGlobalProperty(RefDataSynchronizer.PROP_CONNECT_TIMEOUT, 60000L);
     int readTimeout = (int) OrbitalProperties.getLongGlobalProperty(RefDataSynchronizer.PROP_READ_TIMEOUT, 60000L);
     String serverURI = OrbitalProperties.getGlobalProperty(RefDataSynchronizer.PROP_XML_API_URL, "https://api.eveonline.com");
-    return new EveXmlApiAdapter(EveXmlApiConfig.get().serverURI(serverURI).agent(agentValue).connectTimeout(connectTimeout).readTimeout(readTimeout));
+    return new EveXmlApiAdapter(EveXmlApiConfig.get()
+                                               .serverURI(serverURI)
+                                               .agent(agentValue)
+                                               .connectTimeout(connectTimeout)
+                                               .readTimeout(readTimeout));
   }
 
   /**
    * Verify there are no stuck ref data trackers. If a stuck tracker is found, it is immediately finished.
-   * 
+   *
    * @return true if a stuck tracker was not found, false if a stuck tracker was found and terminated
    */
   protected static boolean verifyTrackerNotStuck() {
@@ -131,7 +134,7 @@ public class RefDataSynchronizer {
 
   /**
    * Verify enough time has passed since the last time ref data was sync'd.
-   * 
+   *
    * @return true if enough time has passed since the last sync of ref data, false otherwise.
    */
   protected static boolean verifyTrackerSeparation() {
@@ -151,11 +154,9 @@ public class RefDataSynchronizer {
   /**
    * Synchronize reference data until either the synchronization is complete, or an unrecoverable error occurs. This method assumes we are the only synchronizer
    * for reference data. The caller is responsible for interrupting this call if it takes too long to complete.
-   * 
-   * @throws IOException
-   *           if an IO error occurs while performing synchronization.
-   * @throws URISyntaxException
-   *           if an error occurs while trying to build an XML API endpoint handle.
+   *
+   * @throws IOException        if an IO error occurs while performing synchronization.
+   * @throws URISyntaxException if an error occurs while trying to build an XML API endpoint handle.
    */
   public void synchronize() throws IOException, URISyntaxException {
     log.fine("Starting sync");
@@ -227,49 +228,49 @@ public class RefDataSynchronizer {
 
   // Initialize support features
   static {
-    supportedFeatures.put(SynchronizationState.SYNC_REF_SERVERSTATUS, new RefStateHandler() {
-
-      @Override
-      public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
-        return ServerStatusSync.exclude(syncUtil);
-      }
-
-      @Override
-      public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
-        return ServerStatusSync.notAllowed(syncUtil);
-      }
-
-      @Override
-      public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
-        return ServerStatusSync.sync(syncTime, syncUtil, apiHandle.getServerAPIService());
-      }
-
-    });
+//    supportedFeatures.put(SynchronizationState.SYNC_REF_SERVERSTATUS, new RefStateHandler() {
+//
+//      @Override
+//      public SyncStatus exclude(
+//                                RefSynchronizerUtil syncUtil) {
+//        return ServerStatusSync.exclude(syncUtil);
+//      }
+//
+//      @Override
+//      public SyncStatus notAllowed(
+//                                   RefSynchronizerUtil syncUtil) {
+//        return ServerStatusSync.notAllowed(syncUtil);
+//      }
+//
+//      @Override
+//      public SyncStatus sync(
+//                             long syncTime,
+//                             RefSynchronizerUtil syncUtil,
+//                             IEveXmlApi apiHandle) {
+//        return ServerStatusSync.sync(syncTime, syncUtil, apiHandle.getServerAPIService());
+//      }
+//
+//    });
 
     supportedFeatures.put(SynchronizationState.SYNC_REF_ALLIANCES, new RefStateHandler() {
 
       @Override
       public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return AllianceSync.exclude(syncUtil);
       }
 
       @Override
       public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return AllianceSync.notAllowed(syncUtil);
       }
 
       @Override
       public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
+          long syncTime,
+          RefSynchronizerUtil syncUtil,
+          IEveXmlApi apiHandle) {
         return AllianceSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
       }
 
@@ -279,21 +280,21 @@ public class RefDataSynchronizer {
 
       @Override
       public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return ConquerableStationsSync.exclude(syncUtil);
       }
 
       @Override
       public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return ConquerableStationsSync.notAllowed(syncUtil);
       }
 
       @Override
       public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
+          long syncTime,
+          RefSynchronizerUtil syncUtil,
+          IEveXmlApi apiHandle) {
         return ConquerableStationsSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
       }
 
@@ -303,21 +304,21 @@ public class RefDataSynchronizer {
 
       @Override
       public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return FacWarStatsSync.exclude(syncUtil);
       }
 
       @Override
       public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return FacWarStatsSync.notAllowed(syncUtil);
       }
 
       @Override
       public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
+          long syncTime,
+          RefSynchronizerUtil syncUtil,
+          IEveXmlApi apiHandle) {
         return FacWarStatsSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
       }
 
@@ -327,21 +328,21 @@ public class RefDataSynchronizer {
 
       @Override
       public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return FacWarTopStatsSync.exclude(syncUtil);
       }
 
       @Override
       public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return FacWarTopStatsSync.notAllowed(syncUtil);
       }
 
       @Override
       public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
+          long syncTime,
+          RefSynchronizerUtil syncUtil,
+          IEveXmlApi apiHandle) {
         return FacWarTopStatsSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
       }
 
@@ -351,21 +352,21 @@ public class RefDataSynchronizer {
 
       @Override
       public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return SkillTreeSync.exclude(syncUtil);
       }
 
       @Override
       public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return SkillTreeSync.notAllowed(syncUtil);
       }
 
       @Override
       public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
+          long syncTime,
+          RefSynchronizerUtil syncUtil,
+          IEveXmlApi apiHandle) {
         return SkillTreeSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
       }
 
@@ -375,21 +376,21 @@ public class RefDataSynchronizer {
 
       @Override
       public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return FacWarSystemsSync.exclude(syncUtil);
       }
 
       @Override
       public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return FacWarSystemsSync.notAllowed(syncUtil);
       }
 
       @Override
       public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
+          long syncTime,
+          RefSynchronizerUtil syncUtil,
+          IEveXmlApi apiHandle) {
         return FacWarSystemsSync.sync(syncTime, syncUtil, apiHandle.getMapAPIService());
       }
 
@@ -399,21 +400,21 @@ public class RefDataSynchronizer {
 
       @Override
       public SyncStatus exclude(
-                                RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return SovereigntySync.exclude(syncUtil);
       }
 
       @Override
       public SyncStatus notAllowed(
-                                   RefSynchronizerUtil syncUtil) {
+          RefSynchronizerUtil syncUtil) {
         return SovereigntySync.notAllowed(syncUtil);
       }
 
       @Override
       public SyncStatus sync(
-                             long syncTime,
-                             RefSynchronizerUtil syncUtil,
-                             IEveXmlApi apiHandle) {
+          long syncTime,
+          RefSynchronizerUtil syncUtil,
+          IEveXmlApi apiHandle) {
         return SovereigntySync.sync(syncTime, syncUtil, apiHandle.getMapAPIService());
       }
 

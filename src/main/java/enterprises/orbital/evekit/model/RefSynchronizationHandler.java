@@ -1,5 +1,7 @@
 package enterprises.orbital.evekit.model;
 
+import java.io.IOException;
+
 public interface RefSynchronizationHandler {
 
   /**
@@ -29,7 +31,7 @@ public interface RefSynchronizationHandler {
 
   public void updateExpiry(
                            RefData container,
-                           long expiry);
+                           long expiry) throws IOException;
 
   public long getExpiryTime(
                             RefData container);
@@ -38,6 +40,6 @@ public interface RefSynchronizationHandler {
                         long time,
                         RefSyncTracker tracker,
                         RefData container,
-                        RefCachedData item);
+                        RefCachedData item) throws IOException;
 
 }

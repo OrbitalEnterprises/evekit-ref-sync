@@ -13,6 +13,7 @@
         <class>enterprises.orbital.db.DBProperty</class>
         <class>enterprises.orbital.evekit.account.GeneralSequenceNumber</class>
         <class>enterprises.orbital.evekit.model.RefSyncTracker</class>
+        <class>enterprises.orbital.evekit.model.ESIRefEndpointSyncTracker</class>
 
         <class>enterprises.orbital.evekit.model.RefCachedData</class>
         <class>enterprises.orbital.evekit.model.RefData</class>

@@ -204,7 +204,12 @@ public class RefSynchronizerUtil {
         log.fine("Processing " + els.size() + " updates");
         long start = OrbitalProperties.getCurrentTime();
         for (RefCachedData i : els) {
-          if (!handler.commit(time, tracker, container, i)) return new IOException(context + " DataCommitter returned false while committing: " + i);
+          try {
+            if (!handler.commit(time, tracker, container, i))
+              return new IOException(context + " DataCommitter returned false while committing: " + i);
+          } catch (IOException e) {
+            return e;
+          }
         }
         long end = OrbitalProperties.getCurrentTime();
         if (log.isLoggable(Level.FINE)) {
@@ -245,8 +250,12 @@ public class RefSynchronizerUtil {
 
         // Update sync state
         handler.updateStatus(tracker, requestStatus, statusDetail);
-        handler.updateExpiry(container, nextExpiry);
-
+        try {
+          handler.updateExpiry(container, nextExpiry);
+        } catch (IOException e) {
+          log.severe(context + " database error while updating expiry");
+          return new TrackTriple(null, null, e);
+        }
         return new TrackTriple(tracker, container, null);
       }
     };

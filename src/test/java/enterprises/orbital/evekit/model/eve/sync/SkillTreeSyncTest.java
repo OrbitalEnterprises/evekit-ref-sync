@@ -395,7 +395,7 @@ public class SkillTreeSyncTest extends RefTestBase {
       SkillGroup newGroup = new SkillGroup(
           i % 2 == 0 ? TestBase.getUniqueRandomInteger() : (Integer) skillGroupTestData[i][0], (String) skillGroupTestData[i][1] + "1");
       newGroup.setup(testTime - 1);
-      RefCachedData.updateData(newGroup);
+      RefCachedData.update(newGroup);
       Object[][] memberData = (Object[][]) skillGroupTestData[i][2];
       for (int j = 0; j < memberData.length; j++) {
         SkillMember newMember = new SkillMember(
@@ -403,19 +403,19 @@ public class SkillTreeSyncTest extends RefTestBase {
             (Integer) memberData[j][2] + 1, (String) memberData[j][3] + "1", (String) memberData[j][4] + "1", (String) memberData[j][6] + "1",
             (Boolean) memberData[j][7]);
         newMember.setup(testTime - 1);
-        RefCachedData.updateData(newMember);
+        RefCachedData.update(newMember);
         Object[][] reqData = (Object[][]) memberData[j][8];
         Object[][] bonusData = (Object[][]) memberData[j][9];
         for (int k = 0; k < reqData.length; k++) {
           RequiredSkill newReq = new RequiredSkill(
               newMember.getTypeID(), k % 2 == 0 ? TestBase.getUniqueRandomInteger() : (Integer) reqData[k][1], (Integer) reqData[k][0] + 1);
           newReq.setup(testTime - 1);
-          RefCachedData.updateData(newReq);
+          RefCachedData.update(newReq);
         }
         for (int k = 0; k < bonusData.length; k++) {
           SkillBonus newBonus = new SkillBonus(newMember.getTypeID(), (String) bonusData[k][0], (String) bonusData[k][1] + "1");
           newBonus.setup(testTime - 1);
-          RefCachedData.updateData(newBonus);
+          RefCachedData.update(newBonus);
         }
       }
     }
@@ -519,25 +519,25 @@ public class SkillTreeSyncTest extends RefTestBase {
     for (int i = 0; i < skillGroupTestData.length; i++) {
       SkillGroup newGroup = new SkillGroup((Integer) skillGroupTestData[i][0] + 1, (String) skillGroupTestData[i][1] + "1");
       newGroup.setup(testTime - 1);
-      RefCachedData.updateData(newGroup);
+      RefCachedData.update(newGroup);
       Object[][] memberData = (Object[][]) skillGroupTestData[i][2];
       for (int j = 0; j < memberData.length; j++) {
         SkillMember newMember = new SkillMember(
             (Integer) memberData[j][1] + 1, (Integer) memberData[j][5] + 1, (String) memberData[j][0] + "1", (Integer) memberData[j][2] + 1,
             (String) memberData[j][3] + "1", (String) memberData[j][4] + "1", (String) memberData[j][6] + "1", (Boolean) memberData[j][7]);
         newMember.setup(testTime - 1);
-        RefCachedData.updateData(newMember);
+        RefCachedData.update(newMember);
         Object[][] reqData = (Object[][]) memberData[j][8];
         Object[][] bonusData = (Object[][]) memberData[j][9];
         for (int k = 0; k < reqData.length; k++) {
           RequiredSkill newReq = new RequiredSkill(newMember.getTypeID(), (Integer) reqData[k][1] + 1, (Integer) reqData[k][0] + 1);
           newReq.setup(testTime - 1);
-          RefCachedData.updateData(newReq);
+          RefCachedData.update(newReq);
         }
         for (int k = 0; k < bonusData.length; k++) {
           SkillBonus newBonus = new SkillBonus(newMember.getTypeID(), (String) bonusData[k][0], (String) bonusData[k][1] + "1");
           newBonus.setup(testTime - 1);
-          RefCachedData.updateData(newBonus);
+          RefCachedData.update(newBonus);
         }
       }
     }
@@ -547,7 +547,7 @@ public class SkillTreeSyncTest extends RefTestBase {
     tracker.setSkillTreeDetail(null);
     tracker = RefSyncTracker.updateTracker(tracker);
     container.setSkillTreeExpiry(prevDate);
-    container = RefCachedData.updateData(container);
+    container = RefCachedData.update(container);
 
     // Perform the sync
     SyncStatus syncOutcome = SkillTreeSync.sync(testTime, syncUtil, mockServer);

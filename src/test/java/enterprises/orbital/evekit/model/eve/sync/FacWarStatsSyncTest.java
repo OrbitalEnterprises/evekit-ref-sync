@@ -369,7 +369,7 @@ public class FacWarStatsSyncTest extends RefTestBase {
           (Integer) facWarSummaryTestData[i][0] + 1, (Integer) facWarSummaryTestData[i][1] + 1, (Integer) facWarSummaryTestData[i][2] + 1,
           (Integer) facWarSummaryTestData[i][3] + 1, (Integer) facWarSummaryTestData[i][4] + 1, (Integer) facWarSummaryTestData[i][5] + 1);
       newSummary.setup(testTime - 1);
-      RefCachedData.updateData(newSummary);
+      RefCachedData.update(newSummary);
     }
     for (int i = 0; i < facStatsTestData.length; i++) {
       // Make half the existing data have unseen faction IDs. These items should be removed during the sync
@@ -380,7 +380,7 @@ public class FacWarStatsSyncTest extends RefTestBase {
           (Integer) facStatsTestData[i][5] + 1, (Integer) facStatsTestData[i][6] + 1, (Integer) facStatsTestData[i][7] + 1,
           (Integer) facStatsTestData[i][8] + 1, (Integer) facStatsTestData[i][9] + 1);
       newStats.setup(testTime - 1);
-      RefCachedData.updateData(newStats);
+      RefCachedData.update(newStats);
     }
     for (int i = 0; i < facWarTestData.length; i++) {
       // Make half the existing data have unseen faction IDs. These items should be removed during the sync
@@ -389,7 +389,7 @@ public class FacWarStatsSyncTest extends RefTestBase {
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (Long) facWarTestData[i][0], (String) facWarTestData[i][1] + "1",
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (Long) facWarTestData[i][2], (String) facWarTestData[i][3] + "1");
       newWar.setup(testTime - 1);
-      RefCachedData.updateData(newWar);
+      RefCachedData.update(newWar);
     }
 
     // Perform the sync
@@ -482,7 +482,7 @@ public class FacWarStatsSyncTest extends RefTestBase {
           (Integer) facWarSummaryTestData[i][0] + 1, (Integer) facWarSummaryTestData[i][1] + 1, (Integer) facWarSummaryTestData[i][2] + 1,
           (Integer) facWarSummaryTestData[i][3] + 1, (Integer) facWarSummaryTestData[i][4] + 1, (Integer) facWarSummaryTestData[i][5] + 1);
       newSummary.setup(testTime - 1);
-      RefCachedData.updateData(newSummary);
+      RefCachedData.update(newSummary);
     }
     for (int i = 0; i < facStatsTestData.length; i++) {
       FactionStats newStats = new FactionStats(
@@ -490,13 +490,13 @@ public class FacWarStatsSyncTest extends RefTestBase {
           (Integer) facStatsTestData[i][4] + 1, (Integer) facStatsTestData[i][5] + 1, (Integer) facStatsTestData[i][6] + 1,
           (Integer) facStatsTestData[i][7] + 1, (Integer) facStatsTestData[i][8] + 1, (Integer) facStatsTestData[i][9] + 1);
       newStats.setup(testTime - 1);
-      RefCachedData.updateData(newStats);
+      RefCachedData.update(newStats);
     }
     for (int i = 0; i < facWarTestData.length; i++) {
       FactionWar newWar = new FactionWar(
           (Long) facWarTestData[i][0] + 1, (String) facWarTestData[i][1] + "1", (Long) facWarTestData[i][2] + 1, (String) facWarTestData[i][3] + "1");
       newWar.setup(testTime - 1);
-      RefCachedData.updateData(newWar);
+      RefCachedData.update(newWar);
     }
 
     // Set the tracker as already updated and populate the container
@@ -504,7 +504,7 @@ public class FacWarStatsSyncTest extends RefTestBase {
     tracker.setFacWarStatsDetail(null);
     tracker = RefSyncTracker.updateTracker(tracker);
     container.setFacWarStatsExpiry(prevDate);
-    container = RefCachedData.updateData(container);
+    container = RefCachedData.update(container);
 
     // Perform the sync
     SyncStatus syncOutcome = FacWarStatsSync.sync(testTime, syncUtil, mockServer);

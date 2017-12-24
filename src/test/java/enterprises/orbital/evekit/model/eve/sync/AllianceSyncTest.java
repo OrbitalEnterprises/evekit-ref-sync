@@ -265,7 +265,7 @@ public class AllianceSyncTest extends RefTestBase {
           i % 2 == 0 ? TestBase.getUniqueRandomLong() : (long) (Long) allianceTestData[i][0], (Long) allianceTestData[i][1] + 1,
           (Integer) allianceTestData[i][2] + 1, allianceTestData[i][3] + "1", allianceTestData[i][4] + "1", (Long) allianceTestData[i][5] + 1);
       newAlliance.setup(testTime - 1);
-      RefCachedData.updateData(newAlliance);
+      RefCachedData.update(newAlliance);
     }
     for (int i = 0; i < allianceMemberTestData.length; i++) {
       // Make half the existing data have unseen corporation IDs. These items should be removed during the sync
@@ -274,7 +274,7 @@ public class AllianceSyncTest extends RefTestBase {
           (Long) allianceMemberTestData[i][0], i % 2 == 0 ? TestBase.getUniqueRandomLong() : (long) (Long) allianceMemberTestData[i][1],
           (Long) allianceMemberTestData[i][2] + 1);
       newMember.setup(testTime - 1);
-      RefCachedData.updateData(newMember);
+      RefCachedData.update(newMember);
     }
 
     // Perform the sync
@@ -357,7 +357,7 @@ public class AllianceSyncTest extends RefTestBase {
           (Long) allianceTestData[i][0] + 1, (Long) allianceTestData[i][1] + 1, (Integer) allianceTestData[i][2] + 1, allianceTestData[i][3] + "1",
           allianceTestData[i][4] + "1", (Long) allianceTestData[i][5] + 1);
       newAlliance.setup(testTime - 1);
-      RefCachedData.updateData(newAlliance);
+      RefCachedData.update(newAlliance);
     }
     for (int i = 0; i < allianceMemberTestData.length; i++) {
       // Make half the existing data have unseen corporation IDs. These items should be removed during the sync
@@ -365,7 +365,7 @@ public class AllianceSyncTest extends RefTestBase {
       AllianceMemberCorporation newMember = new AllianceMemberCorporation(
           (Long) allianceMemberTestData[i][0] + 1, (Long) allianceMemberTestData[i][1] + 1, (Long) allianceMemberTestData[i][2] + 1);
       newMember.setup(testTime - 1);
-      RefCachedData.updateData(newMember);
+      RefCachedData.update(newMember);
     }
 
     // Set the tracker as already updated and populate the container
@@ -373,7 +373,7 @@ public class AllianceSyncTest extends RefTestBase {
     tracker.setAllianceListDetail(null);
     tracker = RefSyncTracker.updateTracker(tracker);
     container.setAllianceListExpiry(prevDate);
-    container = RefCachedData.updateData(container);
+    container = RefCachedData.update(container);
 
     // Perform the sync
     SyncStatus syncOutcome = AllianceSync.sync(testTime, syncUtil, mockServer);

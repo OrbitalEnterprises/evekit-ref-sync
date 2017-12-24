@@ -7,7 +7,7 @@
   </parent>
   <groupId>enterprises.orbital.evekit</groupId>
   <artifactId>ref-sync</artifactId>
-  <version>4.0.2</version>
+  <version>4.1.0</version>
   <name>EveKit Reference Data Sync</name>
   <description>Handles periodic synchronization of reference data</description>
   <url>https://github.com/OrbitalEnterprises/evekit-ref-sync</url>
@@ -17,10 +17,11 @@
     <developerConnection>scm:git:git@github.com:OrbitalEnterprises/evekit-ref-sync.git</developerConnection>
   </scm>
   <properties>
-    <evekit.version>4.0.2</evekit.version>
-    <orbital.version>2.3.0</orbital.version>
+    <evekit.version>4.1.0</evekit.version>
+    <orbital.version>2.4.0</orbital.version>
     <hsqldb.version>2.3.3</hsqldb.version>
     <easymock.version>3.4</easymock.version>
+    <esi.client.version>1.0.0.20171218</esi.client.version>
   </properties>
   <dependencies>
     <dependency>
@@ -32,6 +33,11 @@
       <groupId>enterprises.orbital</groupId>
       <artifactId>eve-xml-api</artifactId>
       <version>${orbital.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>enterprises.orbital.eve.esi</groupId>
+      <artifactId>client</artifactId>
+      <version>${esi.client.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>

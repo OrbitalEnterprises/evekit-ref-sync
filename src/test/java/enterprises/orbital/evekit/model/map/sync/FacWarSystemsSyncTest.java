@@ -200,7 +200,7 @@ public class FacWarSystemsSyncTest extends RefTestBase {
           (Long) systemTestData[i][0] + 1, systemTestData[i][1] + "1", (Long) systemTestData[i][2] + 1, systemTestData[i][3] + "1",
           i % 2 == 0 ? TestBase.getUniqueRandomInteger() : (Integer) systemTestData[i][4], systemTestData[i][5] + "1", !(Boolean) systemTestData[i][6]);
       newSystem.setup(testTime - 1);
-      RefCachedData.updateData(newSystem);
+      RefCachedData.update(newSystem);
     }
 
     // Perform the sync
@@ -252,7 +252,7 @@ public class FacWarSystemsSyncTest extends RefTestBase {
           (Long) systemTestData[i][0] + 1, systemTestData[i][1] + "1", (Long) systemTestData[i][2] + 1, systemTestData[i][3] + "1",
           (Integer) systemTestData[i][4] + 1, systemTestData[i][5] + "1", !(Boolean) systemTestData[i][6]);
       newSystem.setup(testTime - 1);
-      RefCachedData.updateData(newSystem);
+      RefCachedData.update(newSystem);
     }
 
     // Set the tracker as already updated and populate the container
@@ -260,7 +260,7 @@ public class FacWarSystemsSyncTest extends RefTestBase {
     tracker.setFacWarSystemsDetail(null);
     tracker = RefSyncTracker.updateTracker(tracker);
     container.setFacWarSystemsExpiry(prevDate);
-    container = RefCachedData.updateData(container);
+    container = RefCachedData.update(container);
 
     // Perform the sync
     SyncStatus syncOutcome = FacWarSystemsSync.sync(testTime, syncUtil, mockServer);

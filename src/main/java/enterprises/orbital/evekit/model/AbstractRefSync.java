@@ -46,8 +46,8 @@ public abstract class AbstractRefSync implements RefSynchronizationHandler {
                         long time,
                         RefSyncTracker tracker,
                         RefData container,
-                        final RefCachedData item) {
-    return RefCachedData.updateData(item) != null;
+                        final RefCachedData item) throws IOException {
+    return RefCachedData.update(item) != null;
   }
 
   protected abstract Object getServerData(

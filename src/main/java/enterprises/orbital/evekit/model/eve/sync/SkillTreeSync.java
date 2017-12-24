@@ -56,9 +56,9 @@ public class SkillTreeSync extends AbstractRefSync {
   @Override
   public void updateExpiry(
                            RefData container,
-                           long expiry) {
+                           long expiry) throws IOException {
     container.setSkillTreeExpiry(expiry);
-    RefCachedData.updateData(container);
+    RefCachedData.update(container);
   }
 
   @Override
@@ -66,7 +66,7 @@ public class SkillTreeSync extends AbstractRefSync {
                         long time,
                         RefSyncTracker tracker,
                         RefData container,
-                        RefCachedData item) {
+                        RefCachedData item) throws IOException {
 
     if (item instanceof RequiredSkill) {
       RequiredSkill api = (RequiredSkill) item;
