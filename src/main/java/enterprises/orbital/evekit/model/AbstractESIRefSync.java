@@ -2,20 +2,17 @@ package enterprises.orbital.evekit.model;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.base.PersistentProperty;
-import enterprises.orbital.base.PersistentPropertyProvider;
-import enterprises.orbital.db.ConnectionFactory;
 import enterprises.orbital.eve.esi.client.invoker.ApiException;
 import enterprises.orbital.eve.esi.client.invoker.ApiResponse;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
-import enterprises.orbital.evekit.model.server.ServerStatus;
-import enterprises.orbital.evexmlapi.IResponse;
+import enterprises.orbital.evekit.model.eve.Alliance;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.utils.DateUtils;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,20 +35,56 @@ import java.util.logging.Logger;
  * <li>Create a new unfinished tracker for the next update based on cache expiry time.</li>
  * </ol>
  */
-public abstract class AbstractESIRefSync implements ESIRefSynchronizationHandler {
+public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchronizationHandler {
   private static final Logger log = Logger.getLogger(AbstractESIRefSync.class.getName());
 
   // Default delay for future sync events
-  public static final String PROP_DEFAULT_SYNC_DELAY = "enterprises.orbital.evekit.ref_sync_mgr.default_sync_delay";
-  public static final long DEF_DEFAULT_SYNC_DELAY = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES);
+  private static final String PROP_DEFAULT_SYNC_DELAY = "enterprises.orbital.evekit.ref_sync_mgr.default_sync_delay";
+  private static final long DEF_DEFAULT_SYNC_DELAY = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES);
 
   // Default maximum delay for an in-progress synchronization
-  public static final String PROP_MAX_DELAY = "enterprises.orbital.evekit.ref_sync_mgr.max_sync_delay";
-  public static final long DEF_MAX_DELAY = TimeUnit.MILLISECONDS.convert(20, TimeUnit.MINUTES);
+  private static final String PROP_MAX_DELAY = "enterprises.orbital.evekit.ref_sync_mgr.max_sync_delay";
+  private static final long DEF_MAX_DELAY = TimeUnit.MILLISECONDS.convert(20, TimeUnit.MINUTES);
 
   // Batch size for bulk commits
-  public static final String PROP_REF_COMMIT_BATCH_SIZE = "enterprises.orbital.evekit.ref_sync_mgr.commit_batch_size";
-  public static final int DEF_REF_COMMIT_BATCH_SIZE = 200;
+  private static final String PROP_REF_COMMIT_BATCH_SIZE = "enterprises.orbital.evekit.ref_sync_mgr.commit_batch_size";
+  private static final int DEF_REF_COMMIT_BATCH_SIZE = 200;
+
+  // Convenient attribute selector which matches any attribute
+  public static final AttributeSelector ANY_SELECTOR = new AttributeSelector("{ any: true }");
+
+  // Convenience function to construct a time selector for the give time.
+  public static AttributeSelector makeAtSelector(long time) {
+    return new AttributeSelector("{values: [" + time + "]}");
+  }
+
+  // Interface which forwards a call to the class specific query function to retrieve data
+  public interface QueryCaller<A extends RefCachedData> {
+    List<A> query(long contid, AttributeSelector at) throws IOException;
+  }
+
+  /**
+   * Retrieval all data items of the specified type live at the specified time.
+   * This function continues to accumulate results until a query returns no results.
+   *
+   * @param time the "live" time for the retrieval.
+   * @param query an interface which performs the type appropriate query call.
+   * @param <A> class of the object which will be returned.
+   * @return the list of results.
+   * @throws IOException on any DB error.
+   */
+  public static <A extends RefCachedData> List<A> retrieveAll(long time, QueryCaller<A> query) throws IOException {
+    final AttributeSelector ats = makeAtSelector(time);
+    long contid = 0;
+    List<A> results = new ArrayList<>();
+    List<A> nextBatch = query.query(contid, ats);
+    while (!nextBatch.isEmpty()) {
+      results.addAll(nextBatch);
+      contid = nextBatch.get(nextBatch.size() - 1).getCid();
+      nextBatch = query.query(contid, ats);
+    }
+    return results;
+  }
 
   /**
    * {@inheritDoc}
@@ -116,37 +149,41 @@ public abstract class AbstractESIRefSync implements ESIRefSynchronizationHandler
    *
    * @return a mostly opaque object containing server data to be used for the update.
    * @throws ApiException if a client error occurs while retrieving data.
-   * @throws IOException on any other error which occurs while retrieving data.
+   * @throws IOException  on any other error which occurs while retrieving data.
    */
-  protected abstract ESIRefServerResult getServerData(ESIClientProvider cp)
+  protected abstract ESIRefServerResult<ServerDataType> getServerData(ESIClientProvider cp)
       throws ApiException, IOException;
 
   /**
    * Process server data.  Normally, the subclass will extract server data into appropriate types
    * which are added to the update list (and later processed in the "commit" call).
    *
-   * @param time synchronization time.
-   * @param data server result previously retrieved via getServerData
+   * @param time    synchronization time.
+   * @param data    server result previously retrieved via getServerData
    * @param updates list of objects to be updated as a result of processing.
    * @throws IOException on any error which occurs while processing server data
    */
   protected abstract void processServerData(
       long time,
-      ESIRefServerResult data,
+      ESIRefServerResult<ServerDataType> data,
       List<RefCachedData> updates)
       throws IOException;
 
   /**
-   * Convenience method for handling the common case where we should evolve an existing data item if it is different
-   * from an update.  If no existing item is present, then we'll simply setup an store the update item.
+   * Convenience method for handling the common case where we should commit and EOL item
+   * (if update.getLifeStart() != 0), evolve an existing item if it is different from an
+   * update, or initialize and store a new item if no existing item is present.
    *
-   * @param time synchronization time at which this update will occur.
+   * @param time     synchronization time at which this update will occur.
    * @param existing existing data item, if any.
-   * @param update new data item.
-   * @throws IOException
+   * @param update   new data item.
+   * @throws IOException on any database error
    */
   protected void evolveOrAdd(long time, RefCachedData existing, RefCachedData update) throws IOException {
-    if (existing != null) {
+    if (update.getLifeStart() != 0) {
+      // Existing element that is end of life (basically a delete).
+      RefCachedData.update(update);
+    } else if (existing != null) {
       if (!existing.equivalent(update)) {
         // Evolve
         existing.evolve(update, time);
@@ -164,17 +201,36 @@ public abstract class AbstractESIRefSync implements ESIRefSynchronizationHandler
    * Utility method to extract expiry time from an ESI ApiResponse into milliseconds since the epoch UTC.
    *
    * @param result the ApiResponse which may contain an "expires" header.
-   * @param def value to return if header does not contain "expires" or the header can not be parsed properly.
+   * @param def    value to return if header does not contain "expires" or the header can not be parsed properly.
    * @return expires header in milliseconds UTC, or the default.
    */
-  public static long extractExpiry(ApiResponse<?> result, long def) {
+  protected static long extractExpiry(ApiResponse<?> result, long def) {
     try {
-      String expireHeader = result.getHeaders().get("Expires").get(0);
-      return DateUtils.parseDate(expireHeader).getTime();
+      String expireHeader = result.getHeaders()
+                                  .get("Expires")
+                                  .get(0);
+      return DateUtils.parseDate(expireHeader)
+                      .getTime();
     } catch (Exception e) {
       log.log(Level.FINE, "Error parsing header, will return default: " + def, e);
     }
     return def;
+  }
+
+  /**
+   * Utility method to check for common problems with API responses.  The current list of common problems are:
+   *
+   * <ul>
+   *   <li>A return code other than 200.</li>
+   *   <li>A null data response.</li>
+   * </ul>
+   *
+   * @param response the API response to check.
+   * @throws IOException if a common problem is found in the response.
+   */
+  protected static void checkCommonProblems(ApiResponse<?> response) throws IOException {
+    if (response.getStatusCode() != HttpStatus.SC_OK) throw new IOException("Unexpected return code: " + response.getStatusCode());
+    if (response.getData() == null) throw new IOException("Response data is null");
   }
 
   /**
@@ -220,7 +276,7 @@ public abstract class AbstractESIRefSync implements ESIRefSynchronizationHandler
 
       // Set syncTime to the start of the current tracker
       long syncTime = tracker.getSyncStart();
-      long nextEvent = -1;
+      long nextEvent;
 
       try {
         // Retrieve server and process server data.  Any client or processing
@@ -229,7 +285,7 @@ public abstract class AbstractESIRefSync implements ESIRefSynchronizationHandler
         // returned by the data processor is used.
         List<RefCachedData> updateList = new ArrayList<>();
         log.fine("Retrieving server data: " + getContext());
-        ESIRefServerResult serverData = getServerData(cp);
+        ESIRefServerResult<ServerDataType> serverData = getServerData(cp);
         nextEvent = serverData.getExpiryTime();
         log.fine("Processing server data: " + getContext());
         processServerData(syncTime, serverData, updateList);
@@ -301,4 +357,19 @@ public abstract class AbstractESIRefSync implements ESIRefSynchronizationHandler
     }
   }
 
+  // Convenience methods for dealing with missing data from api calls
+  public static int nullSafeInteger(Integer value, int def) {
+    if (value == null) return def;
+    return value.intValue();
+  }
+
+  public static long nullSafeLong(Long value, long def) {
+    if (value == null) return def;
+    return value.longValue();
+  }
+
+  public static DateTime nullSafeDateTime(DateTime value, DateTime def) {
+    if (value == null) return def;
+    return value;
+  }
 }

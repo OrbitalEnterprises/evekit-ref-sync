@@ -21,10 +21,9 @@ import java.util.Map;
 public class ESIServerStatusSyncTest extends RefTestBase {
 
   // Local mocks and other objects
-  ESIRefEndpointSyncTracker tracker;
-  ESIClientProvider mockServer;
-  StatusApi mockEndpoint;
-  long testTime = 1238L;
+  private ESIClientProvider mockServer;
+  private StatusApi mockEndpoint;
+  private long testTime = 1238L;
 
   @Override
   @Before
@@ -32,7 +31,7 @@ public class ESIServerStatusSyncTest extends RefTestBase {
     super.setup();
 
     // Prepare a test sync tracker
-    tracker = ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_SERVER_STATUS, 1234L);
+    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_SERVER_STATUS, 1234L);
 
     // Initialize time keeper
     OrbitalProperties.setTimeGenerator(() -> testTime);
@@ -54,7 +53,7 @@ public class ESIServerStatusSyncTest extends RefTestBase {
   }
 
   // Mock up server interface
-  public void setupOkMock() throws Exception {
+  private void setupOkMock() throws Exception {
     GetStatusOk gsok = new GetStatusOk();
     gsok.setPlayers(12341);
     gsok.setServerVersion("112233");
@@ -85,7 +84,6 @@ public class ESIServerStatusSyncTest extends RefTestBase {
     Assert.assertEquals(testTime, result.getLifeStart());
     Assert.assertEquals(Long.MAX_VALUE, result.getLifeEnd());
     Assert.assertEquals(12341, result.getOnlinePlayers());
-    Assert.assertTrue(result.isServerOpen());
     Assert.assertEquals(DateTime.parse("2015-10-01").getMillis(), result.getStartTime());
     Assert.assertEquals("112233", result.getServerVersion());
     Assert.assertFalse(result.isVip());
@@ -110,7 +108,7 @@ public class ESIServerStatusSyncTest extends RefTestBase {
     EasyMock.replay(mockServer, mockEndpoint);
 
     // Populate existing
-    ServerStatus existing = new ServerStatus(8321, false, 8888L, "1.2.3", false);
+    ServerStatus existing = new ServerStatus(8321, 8888L, "1.2.3", false);
     existing.setup(testTime - 1);
     RefCachedData.update(existing);
 
@@ -127,14 +125,12 @@ public class ESIServerStatusSyncTest extends RefTestBase {
     Assert.assertEquals(8888L, result.getStartTime());
     Assert.assertEquals("1.2.3", result.getServerVersion());
     Assert.assertFalse(result.isVip());
-    Assert.assertFalse(result.isServerOpen());
 
     // Verify updated properly
     result = ServerStatus.get(testTime);
     Assert.assertEquals(testTime, result.getLifeStart());
     Assert.assertEquals(Long.MAX_VALUE, result.getLifeEnd());
     Assert.assertEquals(12341, result.getOnlinePlayers());
-    Assert.assertTrue(result.isServerOpen());
     Assert.assertEquals(DateTime.parse("2015-10-01").getMillis(), result.getStartTime());
     Assert.assertEquals("112233", result.getServerVersion());
     Assert.assertFalse(result.isVip());

@@ -1,6 +1,9 @@
 package enterprises.orbital.evekit.model;
 
+import enterprises.orbital.eve.esi.client.api.AllianceApi;
 import enterprises.orbital.eve.esi.client.api.StatusApi;
+
+import java.util.concurrent.ExecutorService;
 
 /**
  * Implementations of this class are used to provide properly configured ESI clients
@@ -8,5 +11,7 @@ import enterprises.orbital.eve.esi.client.api.StatusApi;
  * also makes it easier to inject test code.
  */
 public interface ESIClientProvider {
+  ExecutorService getScheduler();
   StatusApi getStatusApi();
+  AllianceApi getAllianceApi();
 }

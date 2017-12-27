@@ -20,6 +20,7 @@
         <class>enterprises.orbital.evekit.model.RefModelTypeMap</class>
         <class>enterprises.orbital.evekit.model.server.ServerStatus</class>
         <class>enterprises.orbital.evekit.model.eve.Alliance</class>
+        <class>enterprises.orbital.evekit.model.eve.AllianceIcon</class>
         <class>enterprises.orbital.evekit.model.eve.AllianceMemberCorporation</class>
         <class>enterprises.orbital.evekit.model.eve.CharacterKillStat</class>
         <class>enterprises.orbital.evekit.model.eve.CharacterVictoryPointStat</class>

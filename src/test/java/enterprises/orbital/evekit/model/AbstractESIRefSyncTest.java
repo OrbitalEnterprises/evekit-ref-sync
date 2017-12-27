@@ -2,15 +2,19 @@ package enterprises.orbital.evekit.model;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.eve.esi.client.invoker.ApiException;
+import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
+import enterprises.orbital.evekit.model.eve.AllianceMemberCorporation;
 import enterprises.orbital.evekit.model.server.ServerStatus;
 import org.easymock.EasyMock;
+import org.hsqldb.Server;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AbstractESIRefSyncTest extends RefTestBase {
@@ -26,7 +30,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
   protected long testTime = 1238L;
 
   // Concrete extension of abstract class so we can properly test.
-  public class ClassUnderTest extends AbstractESIRefSync {
+  public class ClassUnderTest extends AbstractESIRefSync<Object> {
 
     protected int simMask = 0;
 
@@ -53,20 +57,20 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     }
 
     @Override
-    protected ESIRefServerResult getServerData(ESIClientProvider cp) throws ApiException, IOException {
+    protected ESIRefServerResult<Object> getServerData(ESIClientProvider cp) throws ApiException, IOException {
       if ((simMask & SIM_API_ERROR) > 0)
         throw new ApiException();
       else
-        return new ESIRefServerResult(1238L, null);
+        return new ESIRefServerResult<>(1238L, null);
     }
 
     @Override
-    protected void processServerData(long time, ESIRefServerResult data,
+    protected void processServerData(long time, ESIRefServerResult<Object> data,
                                      List<RefCachedData> updates) throws IOException {
       if ((simMask & SIM_PROCESS_ERROR) > 0) throw new IOException();
       if ((simMask & SIM_COMMIT_ERROR) > 0) {
         // We can't trigger the commit error unless we have at least one thing to commit
-        updates.add(new ServerStatus(10, true, 1234L, "112233", false));
+        updates.add(new ServerStatus(10, 1234L, "112233", false));
       }
     }
 
@@ -91,6 +95,15 @@ public class AbstractESIRefSyncTest extends RefTestBase {
   @Override
   @After
   public void teardown() throws Exception {
+    // retrieveAll test pollutes the DB so clean that up
+    EveKitRefDataProvider.getFactory()
+                         .runTransaction(() -> {
+                           EveKitRefDataProvider.getFactory()
+                                                .getEntityManager()
+                                                .createQuery("DELETE FROM AllianceMemberCorporation ")
+                                                .executeUpdate();
+                         });
+    // Reset time generator
     OrbitalProperties.setTimeGenerator(null);
     super.teardown();
   }
@@ -205,6 +218,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     Assert.assertEquals(testTime, syncTracker.getSyncEnd());
   }
 
+  @SuppressWarnings("Duplicates")
   @Test
   public void testCommitIOExceptionHandled() throws Exception {
     // Perform the sync
@@ -221,6 +235,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     checkForScheduledTracker(1240L);
   }
 
+  @SuppressWarnings("Duplicates")
   @Test
   public void testProcessIOExceptionHandled() throws Exception {
     // Perform the sync
@@ -237,4 +252,22 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     checkForScheduledTracker(1240L);
   }
 
+  @Test
+  public void testRetrieveAll() throws Exception {
+    // Create at least 1000 AllianceMemberCorporations live at a given time
+    int objCount = 1010 + TestBase.getRandomInt(1000);
+    long allianceID = TestBase.getUniqueRandomLong();
+    List<AllianceMemberCorporation> testObjs = new ArrayList<>();
+    for (int i = 0; i < objCount; i++) {
+      AllianceMemberCorporation next = new AllianceMemberCorporation(allianceID, TestBase.getUniqueRandomLong());
+      next.setup(testTime);
+      testObjs.add(RefCachedData.update(next));
+    }
+
+    // Now setup a retrievAll query to retrieve all the objects we just created.
+    List<AllianceMemberCorporation> stored = AbstractESIRefSync.retrieveAll(testTime,
+                                                                            (long contid, AttributeSelector at) ->
+                                                                                AllianceMemberCorporation.accessQuery(contid, 100, false, at, ANY_SELECTOR, ANY_SELECTOR));
+    Assert.assertEquals(testObjs, stored);
+  }
 }

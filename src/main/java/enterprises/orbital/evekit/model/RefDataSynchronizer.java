@@ -252,29 +252,29 @@ public class RefDataSynchronizer {
 //
 //    });
 
-    supportedFeatures.put(SynchronizationState.SYNC_REF_ALLIANCES, new RefStateHandler() {
-
-      @Override
-      public SyncStatus exclude(
-          RefSynchronizerUtil syncUtil) {
-        return AllianceSync.exclude(syncUtil);
-      }
-
-      @Override
-      public SyncStatus notAllowed(
-          RefSynchronizerUtil syncUtil) {
-        return AllianceSync.notAllowed(syncUtil);
-      }
-
-      @Override
-      public SyncStatus sync(
-          long syncTime,
-          RefSynchronizerUtil syncUtil,
-          IEveXmlApi apiHandle) {
-        return AllianceSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
-      }
-
-    });
+//    supportedFeatures.put(SynchronizationState.SYNC_REF_ALLIANCES, new RefStateHandler() {
+//
+//      @Override
+//      public SyncStatus exclude(
+//          RefSynchronizerUtil syncUtil) {
+//        return AllianceSync.exclude(syncUtil);
+//      }
+//
+//      @Override
+//      public SyncStatus notAllowed(
+//          RefSynchronizerUtil syncUtil) {
+//        return AllianceSync.notAllowed(syncUtil);
+//      }
+//
+//      @Override
+//      public SyncStatus sync(
+//          long syncTime,
+//          RefSynchronizerUtil syncUtil,
+//          IEveXmlApi apiHandle) {
+//        return AllianceSync.sync(syncTime, syncUtil, apiHandle.getEveAPIService());
+//      }
+//
+//    });
 
     supportedFeatures.put(SynchronizationState.SYNC_REF_CONQUERABLE, new RefStateHandler() {
 

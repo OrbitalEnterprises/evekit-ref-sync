@@ -1,6 +1,6 @@
 package enterprises.orbital.evekit.model;
 
-public class ESIRefServerResult {
+public class ESIRefServerResult<A> {
   /**
    * Time when this data expires.  This is normally determined from the ESI headers.
    */
@@ -9,9 +9,9 @@ public class ESIRefServerResult {
   /**
    * Opaque data object capturing the result of the server call.
    */
-  protected Object data;
+  protected A data;
 
-  public ESIRefServerResult(long expiryTime, Object data) {
+  public ESIRefServerResult(long expiryTime, A data) {
     this.expiryTime = expiryTime;
     this.data = data;
   }
@@ -20,7 +20,7 @@ public class ESIRefServerResult {
     return expiryTime;
   }
 
-  public Object getData() {
+  public A getData() {
     return data;
   }
 }
