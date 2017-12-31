@@ -1,4 +1,4 @@
-package enterprises.orbital.evekit.model.eve.sync;
+package enterprises.orbital.evekit.model.alliance.sync;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.eve.esi.client.api.AllianceApi;
@@ -8,9 +8,10 @@ import enterprises.orbital.eve.esi.client.model.GetAlliancesAllianceIdOk;
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
 import enterprises.orbital.evekit.model.*;
-import enterprises.orbital.evekit.model.eve.Alliance;
-import enterprises.orbital.evekit.model.eve.AllianceIcon;
-import enterprises.orbital.evekit.model.eve.AllianceMemberCorporation;
+import enterprises.orbital.evekit.model.alliance.Alliance;
+import enterprises.orbital.evekit.model.alliance.AllianceIcon;
+import enterprises.orbital.evekit.model.alliance.AllianceMemberCorporation;
+import enterprises.orbital.evekit.model.alliance.sync.ESIAllianceSync;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

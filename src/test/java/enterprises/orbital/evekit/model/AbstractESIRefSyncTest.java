@@ -4,10 +4,9 @@ import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.eve.esi.client.invoker.ApiException;
 import enterprises.orbital.evekit.TestBase;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
-import enterprises.orbital.evekit.model.eve.AllianceMemberCorporation;
+import enterprises.orbital.evekit.model.alliance.AllianceMemberCorporation;
 import enterprises.orbital.evekit.model.server.ServerStatus;
 import org.easymock.EasyMock;
-import org.hsqldb.Server;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,24 +16,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static enterprises.orbital.evekit.model.AbstractESIRefSync.ANY_SELECTOR;
+
 public class AbstractESIRefSyncTest extends RefTestBase {
   // We base our test on the ServerStatus endpoint, although any endpoint
   // could be used here.
 
-  protected final int SIM_MAX_DELAY = 1 << 0;
-  protected final int SIM_MISSING_PREREQS = 1 << 1;
-  protected final int SIM_API_ERROR = 1 << 2;
-  protected final int SIM_COMMIT_ERROR = 1 << 3;
-  protected final int SIM_PROCESS_ERROR = 1 << 4;
+  private final int SIM_MAX_DELAY = 1;
+  private final int SIM_MISSING_PREREQS = 1 << 1;
+  private final int SIM_API_ERROR = 1 << 2;
+  private final int SIM_COMMIT_ERROR = 1 << 3;
+  private final int SIM_PROCESS_ERROR = 1 << 4;
 
   protected long testTime = 1238L;
 
   // Concrete extension of abstract class so we can properly test.
   public class ClassUnderTest extends AbstractESIRefSync<Object> {
 
-    protected int simMask = 0;
+    int simMask;
 
-    public ClassUnderTest(int simMask) {
+    ClassUnderTest(int simMask) {
       this.simMask = simMask;
     }
 
@@ -81,7 +82,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
   }
 
   // Standard tracker
-  ESIRefEndpointSyncTracker      tracker;
+  private ESIRefEndpointSyncTracker      tracker;
 
   @Override
   @Before
@@ -179,7 +180,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     Assert.assertEquals(-1L, syncTracker.getSyncEnd());
   }
 
-  public void checkForScheduledTracker(long scheduleTime) throws Exception {
+  private void checkForScheduledTracker(long scheduleTime) throws Exception {
     ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_SERVER_STATUS);
     Assert.assertEquals(scheduleTime, syncTracker.getScheduled());
     Assert.assertEquals(-1L, syncTracker.getSyncStart());
@@ -209,7 +210,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     checkForScheduledTracker(1240L);
   }
 
-  public void checkIOExceptionHandled() throws Exception {
+  private void checkIOExceptionHandled() throws Exception {
     ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(ESIRefSyncEndpoint.REF_SERVER_STATUS);
     Assert.assertEquals(1234L, syncTracker.getScheduled());
     Assert.assertEquals(testTime, syncTracker.getSyncStart());

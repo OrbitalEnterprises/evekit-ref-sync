@@ -5,14 +5,15 @@ import enterprises.orbital.base.PersistentProperty;
 import enterprises.orbital.eve.esi.client.invoker.ApiException;
 import enterprises.orbital.eve.esi.client.invoker.ApiResponse;
 import enterprises.orbital.evekit.account.EveKitRefDataProvider;
-import enterprises.orbital.evekit.model.eve.Alliance;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.utils.DateUtils;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +53,32 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
 
   // Convenient attribute selector which matches any attribute
   public static final AttributeSelector ANY_SELECTOR = new AttributeSelector("{ any: true }");
+
+  // List of endpoints we should skip during synchronization (separate with '|')
+  public static final String    PROP_EXCLUDE_SYNC               = "enterprises.orbital.evekit.ref.exclude_sync";
+
+  /**
+   * Retrieve the ESI endpoints that have been excluded from synchronization by the admin.
+   *
+   * @return the set of excluded ESI endpoints.
+   */
+  public static Set<ESIRefSyncEndpoint> getExcludedEndpoints() {
+    String[] excludedStates = PersistentProperty.getPropertyWithFallback(PROP_EXCLUDE_SYNC, "")
+                                                .split("\\|");
+    Set<ESIRefSyncEndpoint> excluded = new HashSet<>();
+    for (String next : excludedStates) {
+      if (!next.isEmpty()) {
+        try {
+          ESIRefSyncEndpoint val = ESIRefSyncEndpoint.valueOf(next);
+          excluded.add(val);
+        } catch (IllegalArgumentException e) {
+          // Unknown value type, skip
+          log.warning("Unknown endpoint name " + next + ", ignoring.");
+        }
+      }
+    }
+    return excluded;
+  }
 
   // Convenience function to construct a time selector for the give time.
   public static AttributeSelector makeAtSelector(long time) {
@@ -366,6 +393,11 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
   public static long nullSafeLong(Long value, long def) {
     if (value == null) return def;
     return value.longValue();
+  }
+
+  public static float nullSafeFloat(Float value, float def) {
+    if (value == null) return def;
+    return value.floatValue();
   }
 
   public static DateTime nullSafeDateTime(DateTime value, DateTime def) {

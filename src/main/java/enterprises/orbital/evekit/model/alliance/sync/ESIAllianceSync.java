@@ -1,4 +1,4 @@
-package enterprises.orbital.evekit.model.eve.sync;
+package enterprises.orbital.evekit.model.alliance.sync;
 
 import enterprises.orbital.base.OrbitalProperties;
 import enterprises.orbital.eve.esi.client.api.AllianceApi;
@@ -7,9 +7,9 @@ import enterprises.orbital.eve.esi.client.invoker.ApiResponse;
 import enterprises.orbital.eve.esi.client.model.GetAlliancesAllianceIdIconsOk;
 import enterprises.orbital.eve.esi.client.model.GetAlliancesAllianceIdOk;
 import enterprises.orbital.evekit.model.*;
-import enterprises.orbital.evekit.model.eve.Alliance;
-import enterprises.orbital.evekit.model.eve.AllianceIcon;
-import enterprises.orbital.evekit.model.eve.AllianceMemberCorporation;
+import enterprises.orbital.evekit.model.alliance.Alliance;
+import enterprises.orbital.evekit.model.alliance.AllianceIcon;
+import enterprises.orbital.evekit.model.alliance.AllianceMemberCorporation;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -36,16 +36,19 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
   @Override
   protected void commit(long time,
                      RefCachedData item) throws IOException {
-    RefCachedData existing;
-    if (item instanceof Alliance) {
-      existing = Alliance.get(time, ((Alliance) item).getAllianceID());
-    } else if (item instanceof AllianceIcon) {
-      existing = AllianceIcon.get(time, ((AllianceIcon) item).getAllianceID());
-    } else if (item instanceof AllianceMemberCorporation) {
-      AllianceMemberCorporation api = (AllianceMemberCorporation) item;
-      existing = AllianceMemberCorporation.get(time, api.getAllianceID(), api.getCorporationID());
-    } else
-      throw new IOException("Object with unexpected type: " + item.getClass().getName());
+    assert item instanceof Alliance || item instanceof AllianceIcon || item instanceof AllianceMemberCorporation;
+    RefCachedData existing = null;
+    if (item.getLifeStart() == 0) {
+      // Only need to check for existing item if current item is an update
+      if (item instanceof Alliance) {
+        existing = Alliance.get(time, ((Alliance) item).getAllianceID());
+      } else if (item instanceof AllianceIcon) {
+        existing = AllianceIcon.get(time, ((AllianceIcon) item).getAllianceID());
+      } else if (item instanceof AllianceMemberCorporation) {
+        AllianceMemberCorporation api = (AllianceMemberCorporation) item;
+        existing = AllianceMemberCorporation.get(time, api.getAllianceID(), api.getCorporationID());
+      }
+    }
     evolveOrAdd(time, existing, item);
   }
 

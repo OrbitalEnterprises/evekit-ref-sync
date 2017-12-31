@@ -12,32 +12,27 @@
         
         <class>enterprises.orbital.db.DBProperty</class>
         <class>enterprises.orbital.evekit.account.GeneralSequenceNumber</class>
-        <class>enterprises.orbital.evekit.model.RefSyncTracker</class>
         <class>enterprises.orbital.evekit.model.ESIRefEndpointSyncTracker</class>
-
         <class>enterprises.orbital.evekit.model.RefCachedData</class>
-        <class>enterprises.orbital.evekit.model.RefData</class>
         <class>enterprises.orbital.evekit.model.RefModelTypeMap</class>
+        <class>enterprises.orbital.evekit.model.alliance.Alliance</class>
+        <class>enterprises.orbital.evekit.model.alliance.AllianceIcon</class>
+        <class>enterprises.orbital.evekit.model.alliance.AllianceMemberCorporation</class>
+        <class>enterprises.orbital.evekit.model.faction.CharacterKillStat</class>
+        <class>enterprises.orbital.evekit.model.faction.CharacterVictoryPointStat</class>
+        <class>enterprises.orbital.evekit.model.faction.CorporationKillStat</class>
+        <class>enterprises.orbital.evekit.model.faction.CorporationVictoryPointStat</class>
+        <class>enterprises.orbital.evekit.model.faction.FactionKillStat</class>
+        <class>enterprises.orbital.evekit.model.faction.FactionVictoryPointStat</class>
+        <class>enterprises.orbital.evekit.model.faction.FactionStats</class>
+        <class>enterprises.orbital.evekit.model.faction.FactionWar</class>
+        <class>enterprises.orbital.evekit.model.faction.FactionWar</class>
+        <class>enterprises.orbital.evekit.model.faction.FactionWarSystem</class>
         <class>enterprises.orbital.evekit.model.server.ServerStatus</class>
-        <class>enterprises.orbital.evekit.model.eve.Alliance</class>
-        <class>enterprises.orbital.evekit.model.eve.AllianceIcon</class>
-        <class>enterprises.orbital.evekit.model.eve.AllianceMemberCorporation</class>
-        <class>enterprises.orbital.evekit.model.eve.CharacterKillStat</class>
-        <class>enterprises.orbital.evekit.model.eve.CharacterVictoryPointStat</class>
-        <class>enterprises.orbital.evekit.model.eve.ConquerableStation</class>
-        <class>enterprises.orbital.evekit.model.eve.CorporationKillStat</class>
-        <class>enterprises.orbital.evekit.model.eve.CorporationVictoryPointStat</class>
-        <class>enterprises.orbital.evekit.model.eve.FactionKillStat</class>
-        <class>enterprises.orbital.evekit.model.eve.FactionStats</class>
-        <class>enterprises.orbital.evekit.model.eve.FactionVictoryPointStat</class>
-        <class>enterprises.orbital.evekit.model.eve.FactionWar</class>
-        <class>enterprises.orbital.evekit.model.eve.FactionWarSummary</class>
-        <class>enterprises.orbital.evekit.model.eve.RequiredSkill</class>
-        <class>enterprises.orbital.evekit.model.eve.SkillBonus</class>
-        <class>enterprises.orbital.evekit.model.eve.SkillGroup</class>
-        <class>enterprises.orbital.evekit.model.eve.SkillMember</class>
-        <class>enterprises.orbital.evekit.model.map.FactionWarSystem</class>
-        <class>enterprises.orbital.evekit.model.map.Sovereignty</class>
+        <class>enterprises.orbital.evekit.model.sov.SovereigntyCampaign</class>
+        <class>enterprises.orbital.evekit.model.sov.SovereigntyCampaignParticipant</class>
+        <class>enterprises.orbital.evekit.model.sov.SovereigntyMap</class>
+        <class>enterprises.orbital.evekit.model.sov.SovereigntyStructure</class>
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver"/>
