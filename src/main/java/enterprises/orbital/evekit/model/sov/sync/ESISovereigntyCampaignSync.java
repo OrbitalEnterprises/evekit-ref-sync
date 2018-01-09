@@ -42,7 +42,7 @@ public class ESISovereigntyCampaignSync extends AbstractESIRefSync<List<GetSover
 
   @Override
   protected ESIRefServerResult<List<GetSovereigntyCampaigns200Ok>> getServerData(
-      ESIClientProvider cp) throws ApiException, IOException {
+      ESIRefClientProvider cp) throws ApiException, IOException {
     SovereigntyApi apiInstance = cp.getSovereigntyApi();
     ApiResponse<List<GetSovereigntyCampaigns200Ok>> result = apiInstance.getSovereigntyCampaignsWithHttpInfo(null, null, null);
     checkCommonProblems(result);

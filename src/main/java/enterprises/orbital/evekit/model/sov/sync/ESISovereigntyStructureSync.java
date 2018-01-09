@@ -6,7 +6,6 @@ import enterprises.orbital.eve.esi.client.invoker.ApiException;
 import enterprises.orbital.eve.esi.client.invoker.ApiResponse;
 import enterprises.orbital.eve.esi.client.model.GetSovereigntyStructures200Ok;
 import enterprises.orbital.evekit.model.*;
-import enterprises.orbital.evekit.model.server.ServerStatus;
 import enterprises.orbital.evekit.model.sov.SovereigntyStructure;
 import org.joda.time.DateTime;
 
@@ -37,7 +36,7 @@ public class ESISovereigntyStructureSync extends AbstractESIRefSync<List<GetSove
 
   @Override
   protected ESIRefServerResult<List<GetSovereigntyStructures200Ok>> getServerData(
-      ESIClientProvider cp) throws ApiException, IOException {
+      ESIRefClientProvider cp) throws ApiException, IOException {
     SovereigntyApi apiInstance = cp.getSovereigntyApi();
     ApiResponse<List<GetSovereigntyStructures200Ok>> result = apiInstance.getSovereigntyStructuresWithHttpInfo(null, null, null);
     checkCommonProblems(result);

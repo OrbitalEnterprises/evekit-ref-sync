@@ -82,7 +82,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
 
   @SuppressWarnings("unchecked")
   @Override
-  protected ESIRefServerResult<AllianceServerData> getServerData(ESIClientProvider cp) throws ApiException, IOException {
+  protected ESIRefServerResult<AllianceServerData> getServerData(ESIRefClientProvider cp) throws ApiException, IOException {
     AllianceServerData resultData = new AllianceServerData();
     AllianceApi apiInstance = cp.getAllianceApi();
     // Retrieve alliance list

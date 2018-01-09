@@ -44,7 +44,7 @@ public class ESIFacWarFactionLeaderboardSync extends AbstractESIRefSync<GetFwLea
 
   @Override
   protected ESIRefServerResult<GetFwLeaderboardsOk> getServerData(
-      ESIClientProvider cp) throws ApiException, IOException {
+      ESIRefClientProvider cp) throws ApiException, IOException {
     FactionWarfareApi apiInstance = cp.getFactionWarfareApi();
     ApiResponse<GetFwLeaderboardsOk> result = apiInstance.getFwLeaderboardsWithHttpInfo(null, null, null);
     checkCommonProblems(result);

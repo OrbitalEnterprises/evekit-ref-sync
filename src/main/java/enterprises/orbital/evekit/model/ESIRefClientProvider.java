@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
  * to synchronization code.  This allows for the abstraction of initialization code, and
  * also makes it easier to inject test code.
  */
-public interface ESIClientProvider {
+public interface ESIRefClientProvider {
   ExecutorService getScheduler();
   StatusApi getStatusApi();
   AllianceApi getAllianceApi();

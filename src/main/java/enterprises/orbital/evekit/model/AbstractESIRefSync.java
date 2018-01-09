@@ -178,7 +178,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
    * @throws ApiException if a client error occurs while retrieving data.
    * @throws IOException  on any other error which occurs while retrieving data.
    */
-  protected abstract ESIRefServerResult<ServerDataType> getServerData(ESIClientProvider cp)
+  protected abstract ESIRefServerResult<ServerDataType> getServerData(ESIRefClientProvider cp)
       throws ApiException, IOException;
 
   /**
@@ -264,7 +264,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
    * {@inheritDoc}
    */
   @Override
-  public void synch(ESIClientProvider cp) {
+  public void synch(ESIRefClientProvider cp) {
     log.fine("Starting synchronization: " + getContext());
 
     try {

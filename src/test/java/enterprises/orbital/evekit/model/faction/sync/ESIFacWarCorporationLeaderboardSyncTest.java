@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
 
   // Local mocks and other objects
-  private ESIClientProvider mockServer;
+  private ESIRefClientProvider mockServer;
   private FactionWarfareApi mockEndpoint;
   private long testTime = 1238L;
 
@@ -167,7 +167,7 @@ public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
             .andReturn(corpLeaderboardsResponse);
 
     // Finally, setup client provider mock
-    mockServer = EasyMock.createMock(ESIClientProvider.class);
+    mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.expect(mockServer.getFactionWarfareApi())
             .andReturn(mockEndpoint)
             .anyTimes();

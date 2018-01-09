@@ -30,7 +30,7 @@ public class ESIServerStatusSync extends AbstractESIRefSync<GetStatusOk> {
   }
 
   @Override
-  protected ESIRefServerResult<GetStatusOk> getServerData(ESIClientProvider cp) throws ApiException, IOException {
+  protected ESIRefServerResult<GetStatusOk> getServerData(ESIRefClientProvider cp) throws ApiException, IOException {
     StatusApi apiInstance = cp.getStatusApi();
     ApiResponse<GetStatusOk> result = apiInstance.getStatusWithHttpInfo(null, null, null);
     checkCommonProblems(result);

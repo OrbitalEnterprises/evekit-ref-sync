@@ -25,7 +25,7 @@ import java.util.Map;
 public class ESIFacWarStatsSyncTest extends RefTestBase {
 
   // Local mocks and other objects
-  private ESIClientProvider mockServer;
+  private ESIRefClientProvider mockServer;
   private FactionWarfareApi mockEndpoint;
   private long testTime = 1238L;
 
@@ -114,7 +114,7 @@ public class ESIFacWarStatsSyncTest extends RefTestBase {
             .andReturn(factionStatsListResponse);
 
     // Finally, setup client provider mock
-    mockServer = EasyMock.createMock(ESIClientProvider.class);
+    mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.expect(mockServer.getFactionWarfareApi())
             .andReturn(mockEndpoint)
             .anyTimes();

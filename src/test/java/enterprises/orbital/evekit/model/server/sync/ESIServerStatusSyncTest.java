@@ -21,7 +21,7 @@ import java.util.Map;
 public class ESIServerStatusSyncTest extends RefTestBase {
 
   // Local mocks and other objects
-  private ESIClientProvider mockServer;
+  private ESIRefClientProvider mockServer;
   private StatusApi mockEndpoint;
   private long testTime = 1238L;
 
@@ -64,7 +64,7 @@ public class ESIServerStatusSyncTest extends RefTestBase {
     mockEndpoint = EasyMock.createMock(StatusApi.class);
     EasyMock.expect(mockEndpoint.getStatusWithHttpInfo(null, null, null))
             .andReturn(apir);
-    mockServer = EasyMock.createMock(ESIClientProvider.class);
+    mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.expect(mockServer.getStatusApi())
             .andReturn(mockEndpoint);
   }

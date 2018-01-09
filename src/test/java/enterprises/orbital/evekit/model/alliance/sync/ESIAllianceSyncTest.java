@@ -11,7 +11,6 @@ import enterprises.orbital.evekit.model.*;
 import enterprises.orbital.evekit.model.alliance.Alliance;
 import enterprises.orbital.evekit.model.alliance.AllianceIcon;
 import enterprises.orbital.evekit.model.alliance.AllianceMemberCorporation;
-import enterprises.orbital.evekit.model.alliance.sync.ESIAllianceSync;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
 public class ESIAllianceSyncTest extends RefTestBase {
 
   // Local mocks and other objects
-  private ESIClientProvider mockServer;
+  private ESIRefClientProvider mockServer;
   private AllianceApi mockEndpoint;
   private long testTime = 1238L;
 
@@ -170,7 +169,7 @@ public class ESIAllianceSyncTest extends RefTestBase {
     ExecutorService immediateExecutor = Executors.newSingleThreadExecutor();
 
     // Finally, setup client provider mock
-    mockServer = EasyMock.createMock(ESIClientProvider.class);
+    mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.expect(mockServer.getScheduler()).andReturn(immediateExecutor).anyTimes();
     EasyMock.expect(mockServer.getAllianceApi()).andReturn(mockEndpoint).anyTimes();
   }

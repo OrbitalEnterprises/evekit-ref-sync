@@ -44,6 +44,6 @@ public interface ESIRefSynchronizationHandler {
    *
    * @param cp implementation of a client provider for this call.
    */
-  void synch(ESIClientProvider cp);
+  void synch(ESIRefClientProvider cp);
 
 }

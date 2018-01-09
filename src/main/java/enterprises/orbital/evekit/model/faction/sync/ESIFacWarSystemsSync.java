@@ -34,7 +34,7 @@ public class ESIFacWarSystemsSync extends AbstractESIRefSync<List<GetFwSystems20
 
   @Override
   protected ESIRefServerResult<List<GetFwSystems200Ok>> getServerData(
-      ESIClientProvider cp) throws ApiException, IOException {
+      ESIRefClientProvider cp) throws ApiException, IOException {
     FactionWarfareApi apiInstance = cp.getFactionWarfareApi();
     ApiResponse<List<GetFwSystems200Ok>> result = apiInstance.getFwSystemsWithHttpInfo(null, null, null);
     checkCommonProblems(result);

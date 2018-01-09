@@ -58,7 +58,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     }
 
     @Override
-    protected ESIRefServerResult<Object> getServerData(ESIClientProvider cp) throws ApiException, IOException {
+    protected ESIRefServerResult<Object> getServerData(ESIRefClientProvider cp) throws ApiException, IOException {
       if ((simMask & SIM_API_ERROR) > 0)
         throw new ApiException();
       else
@@ -118,7 +118,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     EveKitRefDataProvider.update(syncTracker);
 
     // Perform the sync
-    ESIClientProvider mockServer = EasyMock.createMock(ESIClientProvider.class);
+    ESIRefClientProvider mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.replay(mockServer);
     ClassUnderTest cut = new ClassUnderTest(0);
     cut.synch(mockServer);
@@ -140,7 +140,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     EveKitRefDataProvider.update(syncTracker);
 
     // Perform the sync
-    ESIClientProvider mockServer = EasyMock.createMock(ESIClientProvider.class);
+    ESIRefClientProvider mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.replay(mockServer);
     ClassUnderTest cut = new ClassUnderTest(SIM_MAX_DELAY);
     OrbitalProperties.setTimeGenerator(() -> testTime);
@@ -166,7 +166,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
   @Test
   public void testNoSyncIfNoPreReqs() throws Exception {
     // Perform the sync with a synchronizer with unsatisfied pre-reqs
-    ESIClientProvider mockServer = EasyMock.createMock(ESIClientProvider.class);
+    ESIRefClientProvider mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.replay(mockServer);
     ClassUnderTest cut = new ClassUnderTest(SIM_MISSING_PREREQS);
     cut.synch(mockServer);
@@ -192,7 +192,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
   @Test
   public void testAPIExceptionHandled() throws Exception {
     // Perform the sync
-    ESIClientProvider mockServer = EasyMock.createMock(ESIClientProvider.class);
+    ESIRefClientProvider mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.replay(mockServer);
     ClassUnderTest cut = new ClassUnderTest(SIM_API_ERROR);
     OrbitalProperties.setTimeGenerator(() -> testTime);
@@ -223,7 +223,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
   @Test
   public void testCommitIOExceptionHandled() throws Exception {
     // Perform the sync
-    ESIClientProvider mockServer = EasyMock.createMock(ESIClientProvider.class);
+    ESIRefClientProvider mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.replay(mockServer);
     ClassUnderTest cut = new ClassUnderTest(SIM_COMMIT_ERROR);
     OrbitalProperties.setTimeGenerator(() -> testTime);
@@ -240,7 +240,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
   @Test
   public void testProcessIOExceptionHandled() throws Exception {
     // Perform the sync
-    ESIClientProvider mockServer = EasyMock.createMock(ESIClientProvider.class);
+    ESIRefClientProvider mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.replay(mockServer);
     ClassUnderTest cut = new ClassUnderTest(SIM_PROCESS_ERROR);
     OrbitalProperties.setTimeGenerator(() -> testTime);

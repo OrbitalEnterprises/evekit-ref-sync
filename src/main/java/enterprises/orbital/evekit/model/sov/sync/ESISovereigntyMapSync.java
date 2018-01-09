@@ -6,7 +6,6 @@ import enterprises.orbital.eve.esi.client.invoker.ApiException;
 import enterprises.orbital.eve.esi.client.invoker.ApiResponse;
 import enterprises.orbital.eve.esi.client.model.GetSovereigntyMap200Ok;
 import enterprises.orbital.evekit.model.*;
-import enterprises.orbital.evekit.model.server.ServerStatus;
 import enterprises.orbital.evekit.model.sov.SovereigntyMap;
 
 import java.io.IOException;
@@ -35,7 +34,7 @@ public class ESISovereigntyMapSync extends AbstractESIRefSync<List<GetSovereignt
 
   @Override
   protected ESIRefServerResult<List<GetSovereigntyMap200Ok>> getServerData(
-      ESIClientProvider cp) throws ApiException, IOException {
+      ESIRefClientProvider cp) throws ApiException, IOException {
     SovereigntyApi apiInstance = cp.getSovereigntyApi();
     ApiResponse<List<GetSovereigntyMap200Ok>> result = apiInstance.getSovereigntyMapWithHttpInfo(null, null, null);
     checkCommonProblems(result);

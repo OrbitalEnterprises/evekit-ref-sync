@@ -31,11 +31,6 @@
       <version>${evekit.version}</version>
     </dependency>
     <dependency>
-      <groupId>enterprises.orbital</groupId>
-      <artifactId>eve-xml-api</artifactId>
-      <version>${orbital.version}</version>
-    </dependency>
-    <dependency>
       <groupId>enterprises.orbital.eve.esi</groupId>
       <artifactId>client</artifactId>
       <version>${esi.client.version}</version>
