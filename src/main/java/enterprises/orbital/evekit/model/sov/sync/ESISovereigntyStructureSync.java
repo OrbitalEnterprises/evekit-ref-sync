@@ -13,6 +13,8 @@ import org.joda.time.DateTime;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -48,23 +50,34 @@ public class ESISovereigntyStructureSync extends AbstractESIRefSync<List<GetSove
   protected void processServerData(long time, ESIRefServerResult<List<GetSovereigntyStructures200Ok>> data,
                                    List<RefCachedData> updates) throws IOException {
     List<GetSovereigntyStructures200Ok> serverData = data.getData();
-    // Create updates for all structures
-    Set<Long> seenStructures = new HashSet<>();
-    for (GetSovereigntyStructures200Ok next : serverData) {
-      updates.add(new SovereigntyStructure(next.getAllianceId(), next.getSolarSystemId(), next.getStructureId(), next.getStructureTypeId(),
-                                           nullSafeFloat(next.getVulnerabilityOccupancyLevel(), 0F),
-                                           nullSafeDateTime(next.getVulnerableStartTime(), new DateTime(new Date(0))).getMillis(),
-                                           nullSafeDateTime(next.getVulnerableEndTime(), new DateTime(new Date(0))).getMillis()));
-      seenStructures.add(next.getStructureId());
-    }
-    // Look for any structures not contained in the update and schedule for EOL
+
+    // Map all current existing structures
     List<SovereigntyStructure> stored = retrieveAll(time, (long contid, AttributeSelector at) ->
         SovereigntyStructure.accessQuery(contid, 1000, false, at, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR));
-    for (SovereigntyStructure next : stored) {
-      if (!seenStructures.contains(next.getStructureID())) {
+    Map<Long, SovereigntyStructure> current = new HashMap<>();
+    for (SovereigntyStructure i : stored) {
+	current.put(i.getStructureID(), i);
+    }
+
+    // Inspect structure updates.  If a structure is new or different from the current version, then schedule for update.
+    for (GetSovereigntyStructures200Ok next : serverData) {
+	SovereigntyStructure nextStructure = new SovereigntyStructure(next.getAllianceId(), next.getSolarSystemId(), next.getStructureId(), next.getStructureTypeId(),
+                                           nullSafeFloat(next.getVulnerabilityOccupancyLevel(), 0F),
+                                           nullSafeDateTime(next.getVulnerableStartTime(), new DateTime(new Date(0))).getMillis(),
+                                           nullSafeDateTime(next.getVulnerableEndTime(), new DateTime(new Date(0))).getMillis());
+	SovereigntyStructure existing = current.get(next.getStructureId());
+	if (existing == null || !existing.equivalent(nextStructure)) {
+	    updates.add(nextStructure);
+	}
+	if (existing != null) {
+	    current.remove(next.getStructureId());
+	}
+    }
+
+    // Anything left in the current map should be end of lifed
+    for (SovereigntyStructure next : current.values()) {
         next.evolve(null, time);
         updates.add(next);
-      }
     }
   }
 
