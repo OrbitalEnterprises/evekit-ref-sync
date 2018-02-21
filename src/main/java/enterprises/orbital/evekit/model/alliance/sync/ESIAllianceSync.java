@@ -191,33 +191,51 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
       }
     }
     // Process new alliance list
+    Map<Long, Alliance> alMap = new HashMap<>();
+    for (Alliance na : existing) {
+	alMap.put(na.getAllianceID(), na);
+    }
     for (int allianceID : serverData.allianceList) {
       // Construct and add Alliance for update
       GetAlliancesAllianceIdOk allianceData = serverData.allianceMap.get(allianceID);
       assert allianceData != null;
       List<Integer> allianceCorpList = serverData.corpListMap.get(allianceID);
       assert allianceCorpList != null;
-      updates.add(new Alliance(allianceID,
-                               nullSafeInteger(allianceData.getExecutorCorporationId(), -1),
-                               allianceCorpList.size(),
-                               allianceData.getName(),
-                               allianceData.getTicker(),
-                               nullSafeDateTime(allianceData.getDateFounded(), new DateTime(new Date(0))).getMillis(),
-                               nullSafeInteger(allianceData.getCreatorId(), -1),
-                               nullSafeInteger(allianceData.getCreatorCorporationId(), -1),
-                               nullSafeInteger(allianceData.getFactionId(), 0)));
+      // Skip update if unchanged
+      Alliance na = new Alliance(allianceID,
+				 nullSafeInteger(allianceData.getExecutorCorporationId(), -1),
+				 allianceCorpList.size(),
+				 allianceData.getName(),
+				 allianceData.getTicker(),
+				 nullSafeDateTime(allianceData.getDateFounded(), new DateTime(new Date(0))).getMillis(),
+				 nullSafeInteger(allianceData.getCreatorId(), -1),
+				 nullSafeInteger(allianceData.getCreatorCorporationId(), -1),
+				 nullSafeInteger(allianceData.getFactionId(), 0));
+      Alliance existingA = alMap.get(allianceID);
+      if (existingA == null || !na.equivalent(existingA)) {
+	  updates.add(na);
+      }
       // Construct and add AllianceIcon for update
       GetAlliancesAllianceIdIconsOk allianceIcon = serverData.iconMap.get(allianceID);
       assert allianceIcon != null;
-      updates.add(new AllianceIcon(allianceID, allianceIcon.getPx64x64(), allianceIcon.getPx128x128()));
+      AllianceIcon existingIcon = AllianceIcon.get(time, allianceID);
+      AllianceIcon ni = new AllianceIcon(allianceID, allianceIcon.getPx64x64(), allianceIcon.getPx128x128());
+      if (existingIcon == null || !ni.equivalent(existingIcon)) {
+	  updates.add(ni);
+      }
       // Construct and add AllianceMemberCorporations for update
+      AttributeSelector byAllianceID = new AttributeSelector("{ values: [" + allianceID + "]}");
+      List<AllianceMemberCorporation> existingMembers = retrieveAll(time, (long contid, AttributeSelector at) -> AllianceMemberCorporation.accessQuery(contid, 1000, false, at, byAllianceID, ANY_SELECTOR));
+      Set<Long> storedMembers = new HashSet<>();
+      for (AllianceMemberCorporation nc : existingMembers) {
+	  storedMembers.add(nc.getCorporationID());
+      }
       for (int nextCorpID : allianceCorpList) {
-        updates.add(new AllianceMemberCorporation(allianceID, nextCorpID));
+	  if (!storedMembers.contains(Long.valueOf(nextCorpID)))
+	      updates.add(new AllianceMemberCorporation(allianceID, nextCorpID));
       }
       // Check for any corporations that are no longer members and delete
       Set<Integer> existingCorpMembers = new HashSet<>(allianceCorpList);
-      AttributeSelector byAllianceID = new AttributeSelector("{ values: [" + allianceID + "]}");
-      List<AllianceMemberCorporation> existingMembers = retrieveAll(time, (long contid, AttributeSelector at) -> AllianceMemberCorporation.accessQuery(contid, 1000, false, at, byAllianceID, ANY_SELECTOR));
       for (AllianceMemberCorporation nextCorp : existingMembers) {
         if (!existingCorpMembers.contains((int) nextCorp.getCorporationID())) {
           nextCorp.evolve(null, time);
