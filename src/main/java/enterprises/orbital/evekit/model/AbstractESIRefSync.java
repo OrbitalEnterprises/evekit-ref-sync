@@ -100,6 +100,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
    * @return the list of results.
    * @throws IOException on any DB error.
    */
+  @SuppressWarnings("Duplicates")
   public static <A extends RefCachedData> List<A> retrieveAll(long time, QueryCaller<A> query) throws IOException {
     final AttributeSelector ats = makeAtSelector(time);
     long contid = 0;

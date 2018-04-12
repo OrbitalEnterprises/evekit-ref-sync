@@ -35,7 +35,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
 
   @Override
   protected void commit(long time,
-                     RefCachedData item) throws IOException {
+                        RefCachedData item) throws IOException {
     assert item instanceof Alliance || item instanceof AllianceIcon || item instanceof AllianceMemberCorporation;
     RefCachedData existing = null;
     if (item.getLifeStart() == 0) {
@@ -44,7 +44,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
         existing = Alliance.get(time, ((Alliance) item).getAllianceID());
       } else if (item instanceof AllianceIcon) {
         existing = AllianceIcon.get(time, ((AllianceIcon) item).getAllianceID());
-      } else if (item instanceof AllianceMemberCorporation) {
+      } else {
         AllianceMemberCorporation api = (AllianceMemberCorporation) item;
         existing = AllianceMemberCorporation.get(time, api.getAllianceID(), api.getCorporationID());
       }
@@ -82,7 +82,8 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
 
   @SuppressWarnings("unchecked")
   @Override
-  protected ESIRefServerResult<AllianceServerData> getServerData(ESIRefClientProvider cp) throws ApiException, IOException {
+  protected ESIRefServerResult<AllianceServerData> getServerData(
+      ESIRefClientProvider cp) throws ApiException, IOException {
     AllianceServerData resultData = new AllianceServerData();
     AllianceApi apiInstance = cp.getAllianceApi();
     // Retrieve alliance list
@@ -93,41 +94,50 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
     resultData.allianceList.addAll(resultAllianceList.getData());
     int allianceCount = resultData.allianceList.size();
     log.fine(getContext() + " done retrieving alliance list: " + resultData.allianceList.size() + " retrieved");
+
     // Retrieve alliance details
     log.fine(getContext() + " retrieving alliance details");
     final int BATCH_SIZE = 100;
     Map<Integer, Object> asyncCallMap = Collections.synchronizedMap(new HashMap<>());
     Map<Integer, Integer> allianceIDMap = new HashMap<>();
     int resultKey = 0;
+
     for (int resultCount = 0; resultCount < allianceCount; resultCount += BATCH_SIZE) {
       // Make the next (max) BATCH_SIZE asynchronous calls
       int expecting = Math.min(resultCount + BATCH_SIZE, allianceCount);
       log.fine(getContext() + " starting next batch up to " + expecting + " results");
       List<Integer> nextAllianceList = resultData.allianceList.subList(resultCount, expecting);
+
       for (int nextAlliance : nextAllianceList) {
         // Submit alliance data request
         allianceIDMap.put(resultKey, nextAlliance);
-        cp.getScheduler().submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
-            ApiResponse<GetAlliancesAllianceIdOk> resultAlliance = apiInstance.getAlliancesAllianceIdWithHttpInfo(nextAlliance, null, null, null);
+        cp.getScheduler()
+          .submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
+            ApiResponse<GetAlliancesAllianceIdOk> resultAlliance = apiInstance.getAlliancesAllianceIdWithHttpInfo(
+                nextAlliance, null, null, null);
             checkCommonProblems(resultAlliance);
             return resultAlliance.getData();
           }));
 
         // Submit alliance icon request
         allianceIDMap.put(resultKey, nextAlliance);
-        cp.getScheduler().submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
-          ApiResponse<GetAlliancesAllianceIdIconsOk> resultIcons = apiInstance.getAlliancesAllianceIdIconsWithHttpInfo(nextAlliance, null, null, null);
-          checkCommonProblems(resultIcons);
-          return resultIcons.getData();
-        }));
+        cp.getScheduler()
+          .submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
+            ApiResponse<GetAlliancesAllianceIdIconsOk> resultIcons = apiInstance.getAlliancesAllianceIdIconsWithHttpInfo(
+                nextAlliance, null, null, null);
+            checkCommonProblems(resultIcons);
+            return resultIcons.getData();
+          }));
 
         // Submit alliance corporations request
         allianceIDMap.put(resultKey, nextAlliance);
-        cp.getScheduler().submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
-          ApiResponse<List<Integer>> resultCorpList = apiInstance.getAlliancesAllianceIdCorporationsWithHttpInfo(nextAlliance, null, null, null);
-          checkCommonProblems(resultCorpList);
-          return resultCorpList.getData();
-        }));
+        cp.getScheduler()
+          .submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
+            ApiResponse<List<Integer>> resultCorpList = apiInstance.getAlliancesAllianceIdCorporationsWithHttpInfo(
+                nextAlliance, null, null, null);
+            checkCommonProblems(resultCorpList);
+            return resultCorpList.getData();
+          }));
       }
       synchronized (asyncCallMap) {
         while (asyncCallMap.size() < expecting * 3) {
@@ -157,7 +167,8 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
       else if (nextResult instanceof List)
         resultData.corpListMap.put(allianceID, (List<Integer>) nextResult);
       else
-        throw new IOException("Result object has unexpected type: " + nextResult.getClass().getName());
+        throw new IOException("Result object has unexpected type: " + nextResult.getClass()
+                                                                                .getName());
     }
     log.fine(getContext() + " done retrieving alliance details");
     return new ESIRefServerResult<>(expiry, resultData);
@@ -165,10 +176,22 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
 
   @SuppressWarnings("RedundantThrows")
   @Override
-  protected void processServerData(long time, ESIRefServerResult<AllianceServerData> data, List<RefCachedData> updates) throws IOException {
+  protected void processServerData(long time, ESIRefServerResult<AllianceServerData> data,
+                                   List<RefCachedData> updates) throws IOException {
     // Detect any missing alliances and mark their data for removal
     AllianceServerData serverData = data.getData();
-    List<Alliance> existing = retrieveAll(time, (long contid, AttributeSelector at) -> Alliance.accessQuery(contid, 1000, false, at, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR, ANY_SELECTOR));
+    List<Alliance> existing = retrieveAll(time,
+                                          (long contid, AttributeSelector at) -> Alliance.accessQuery(contid, 1000,
+                                                                                                      false, at,
+                                                                                                      ANY_SELECTOR,
+                                                                                                      ANY_SELECTOR,
+                                                                                                      ANY_SELECTOR,
+                                                                                                      ANY_SELECTOR,
+                                                                                                      ANY_SELECTOR,
+                                                                                                      ANY_SELECTOR,
+                                                                                                      ANY_SELECTOR,
+                                                                                                      ANY_SELECTOR,
+                                                                                                      ANY_SELECTOR));
     Set<Integer> current = new HashSet<>(serverData.allianceList);
     for (Alliance nextAlliance : existing) {
       if (!current.contains((int) nextAlliance.getAllianceID())) {
@@ -183,7 +206,10 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
         }
         // Handle member corporations associated with this alliance
         AttributeSelector byAllianceID = new AttributeSelector("{ values: [" + nextAlliance.getAllianceID() + "]}");
-        List<AllianceMemberCorporation> existingMembers = retrieveAll(time, (long contid, AttributeSelector at) -> AllianceMemberCorporation.accessQuery(contid, 1000, false, at, byAllianceID, ANY_SELECTOR));
+        List<AllianceMemberCorporation> existingMembers = retrieveAll(time,
+                                                                      (long contid, AttributeSelector at) -> AllianceMemberCorporation.accessQuery(
+                                                                          contid, 1000, false, at, byAllianceID,
+                                                                          ANY_SELECTOR));
         for (AllianceMemberCorporation nextCorp : existingMembers) {
           nextCorp.evolve(null, time);
           updates.add(nextCorp);
@@ -191,33 +217,54 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
       }
     }
     // Process new alliance list
+    Map<Long, Alliance> alMap = new HashMap<>();
+    for (Alliance na : existing) {
+      alMap.put(na.getAllianceID(), na);
+    }
     for (int allianceID : serverData.allianceList) {
       // Construct and add Alliance for update
       GetAlliancesAllianceIdOk allianceData = serverData.allianceMap.get(allianceID);
       assert allianceData != null;
       List<Integer> allianceCorpList = serverData.corpListMap.get(allianceID);
       assert allianceCorpList != null;
-      updates.add(new Alliance(allianceID,
-                               nullSafeInteger(allianceData.getExecutorCorporationId(), -1),
-                               allianceCorpList.size(),
-                               allianceData.getName(),
-                               allianceData.getTicker(),
-                               nullSafeDateTime(allianceData.getDateFounded(), new DateTime(new Date(0))).getMillis(),
-                               nullSafeInteger(allianceData.getCreatorId(), -1),
-                               nullSafeInteger(allianceData.getCreatorCorporationId(), -1),
-                               nullSafeInteger(allianceData.getFactionId(), 0)));
+      // Skip update if unchanged
+      Alliance na = new Alliance(allianceID,
+                                 nullSafeInteger(allianceData.getExecutorCorporationId(), -1),
+                                 allianceCorpList.size(),
+                                 allianceData.getName(),
+                                 allianceData.getTicker(),
+                                 nullSafeDateTime(allianceData.getDateFounded(), new DateTime(new Date(0))).getMillis(),
+                                 nullSafeInteger(allianceData.getCreatorId(), -1),
+                                 nullSafeInteger(allianceData.getCreatorCorporationId(), -1),
+                                 nullSafeInteger(allianceData.getFactionId(), 0));
+      Alliance existingA = alMap.get(allianceID);
+      if (existingA == null || !na.equivalent(existingA)) {
+        updates.add(na);
+      }
       // Construct and add AllianceIcon for update
       GetAlliancesAllianceIdIconsOk allianceIcon = serverData.iconMap.get(allianceID);
       assert allianceIcon != null;
-      updates.add(new AllianceIcon(allianceID, allianceIcon.getPx64x64(), allianceIcon.getPx128x128()));
+      AllianceIcon existingIcon = AllianceIcon.get(time, allianceID);
+      AllianceIcon ni = new AllianceIcon(allianceID, allianceIcon.getPx64x64(), allianceIcon.getPx128x128());
+      if (existingIcon == null || !ni.equivalent(existingIcon)) {
+        updates.add(ni);
+      }
       // Construct and add AllianceMemberCorporations for update
+      AttributeSelector byAllianceID = new AttributeSelector("{ values: [" + allianceID + "]}");
+      List<AllianceMemberCorporation> existingMembers = retrieveAll(time,
+                                                                    (long contid, AttributeSelector at) -> AllianceMemberCorporation.accessQuery(
+                                                                        contid, 1000, false, at, byAllianceID,
+                                                                        ANY_SELECTOR));
+      Set<Long> storedMembers = new HashSet<>();
+      for (AllianceMemberCorporation nc : existingMembers) {
+        storedMembers.add(nc.getCorporationID());
+      }
       for (int nextCorpID : allianceCorpList) {
-        updates.add(new AllianceMemberCorporation(allianceID, nextCorpID));
+        if (!storedMembers.contains((long) nextCorpID))
+          updates.add(new AllianceMemberCorporation(allianceID, nextCorpID));
       }
       // Check for any corporations that are no longer members and delete
       Set<Integer> existingCorpMembers = new HashSet<>(allianceCorpList);
-      AttributeSelector byAllianceID = new AttributeSelector("{ values: [" + allianceID + "]}");
-      List<AllianceMemberCorporation> existingMembers = retrieveAll(time, (long contid, AttributeSelector at) -> AllianceMemberCorporation.accessQuery(contid, 1000, false, at, byAllianceID, ANY_SELECTOR));
       for (AllianceMemberCorporation nextCorp : existingMembers) {
         if (!existingCorpMembers.contains((int) nextCorp.getCorporationID())) {
           nextCorp.evolve(null, time);
