@@ -17,9 +17,11 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.AllianceServerData> {
   protected static final Logger log = Logger.getLogger(ESIAllianceSync.class.getName());
+  private String context;
 
   class AllianceServerData {
     List<Integer> allianceList = new ArrayList<>();
@@ -31,6 +33,11 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
   @Override
   public ESIRefSyncEndpoint endpoint() {
     return ESIRefSyncEndpoint.REF_ALLIANCE;
+  }
+
+  @Override
+  protected String getNextSyncContext() {
+    return context;
   }
 
   @Override
@@ -90,10 +97,31 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
     log.fine(getContext() + " retrieving alliance list");
     ApiResponse<List<Integer>> resultAllianceList = apiInstance.getAlliancesWithHttpInfo(null, null, null);
     checkCommonProblems(resultAllianceList);
-    long expiry = extractExpiry(resultAllianceList, OrbitalProperties.getCurrentTime() + maxDelay());
-    resultData.allianceList.addAll(resultAllianceList.getData());
+    // Hard code expiry to six minutes in the future so that we properly cycle through all the alliances
+    long expiry = OrbitalProperties.getCurrentTime() + TimeUnit.MILLISECONDS.convert(6, TimeUnit.MINUTES);
+
+    // If a context is present, use it to filter out which alliances we'll process.
+    // We batch alliance sync since the set of alliances is so large.
+    int allianceFilter;
+    try {
+      allianceFilter = Integer.valueOf(getCurrentTracker().getContext());
+      allianceFilter = Math.max(allianceFilter, 0);
+    } catch (Exception e) {
+      // No filter exists, assign a random filter
+      allianceFilter = (int) ((OrbitalProperties.getCurrentTime() / 1000) % 10);
+    }
+
+    // Filter alliance list by alliance filter to produce target batch.
+    final int allianceBatch = allianceFilter;
+    resultData.allianceList.addAll(resultAllianceList.getData().stream()
+                                                     .filter(x -> (x % 10) == allianceBatch)
+                                                     .collect(Collectors.toList()));
     int allianceCount = resultData.allianceList.size();
     log.fine(getContext() + " done retrieving alliance list: " + resultData.allianceList.size() + " retrieved");
+
+    // Prepare filter and context for next tracker
+    allianceFilter = (allianceFilter + 1) % 10;
+    context = String.valueOf(allianceFilter);
 
     // Retrieve alliance details
     log.fine(getContext() + " retrieving alliance details");
@@ -237,7 +265,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
                                  nullSafeInteger(allianceData.getCreatorId(), -1),
                                  nullSafeInteger(allianceData.getCreatorCorporationId(), -1),
                                  nullSafeInteger(allianceData.getFactionId(), 0));
-      Alliance existingA = alMap.get(allianceID);
+      Alliance existingA = alMap.get((long) allianceID);
       if (existingA == null || !na.equivalent(existingA)) {
         updates.add(na);
       }

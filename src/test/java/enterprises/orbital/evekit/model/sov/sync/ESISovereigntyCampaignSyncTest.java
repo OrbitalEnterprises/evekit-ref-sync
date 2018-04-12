@@ -75,7 +75,7 @@ public class ESISovereigntyCampaignSyncTest extends RefTestBase {
     super.setup();
 
     // Prepare a test sync tracker
-    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_SOV_CAMPAIGN, 1234L);
+    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_SOV_CAMPAIGN, 1234L, null);
 
     // Initialize time keeper
     OrbitalProperties.setTimeGenerator(() -> testTime);

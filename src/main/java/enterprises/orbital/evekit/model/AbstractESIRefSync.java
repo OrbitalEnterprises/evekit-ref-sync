@@ -55,7 +55,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
   public static final AttributeSelector ANY_SELECTOR = new AttributeSelector("{ any: true }");
 
   // List of endpoints we should skip during synchronization (separate with '|')
-  public static final String    PROP_EXCLUDE_SYNC               = "enterprises.orbital.evekit.ref.exclude_sync";
+  public static final String PROP_EXCLUDE_SYNC = "enterprises.orbital.evekit.ref.exclude_sync";
 
   /**
    * Retrieve the ESI endpoints that have been excluded from synchronization by the admin.
@@ -94,9 +94,9 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
    * Retrieval all data items of the specified type live at the specified time.
    * This function continues to accumulate results until a query returns no results.
    *
-   * @param time the "live" time for the retrieval.
+   * @param time  the "live" time for the retrieval.
    * @param query an interface which performs the type appropriate query call.
-   * @param <A> class of the object which will be returned.
+   * @param <A>   class of the object which will be returned.
    * @return the list of results.
    * @throws IOException on any DB error.
    */
@@ -108,7 +108,8 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
     List<A> nextBatch = query.query(contid, ats);
     while (!nextBatch.isEmpty()) {
       results.addAll(nextBatch);
-      contid = nextBatch.get(nextBatch.size() - 1).getCid();
+      contid = nextBatch.get(nextBatch.size() - 1)
+                        .getCid();
       nextBatch = query.query(contid, ats);
     }
     return results;
@@ -138,7 +139,8 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
    * @return a time in the future when the next synchronization should be scheduled.
    */
   protected long defaultNextEvent() {
-    return OrbitalProperties.getCurrentTime() + OrbitalProperties.getLongGlobalProperty(PROP_DEFAULT_SYNC_DELAY, DEF_DEFAULT_SYNC_DELAY);
+    return OrbitalProperties.getCurrentTime() + OrbitalProperties.getLongGlobalProperty(PROP_DEFAULT_SYNC_DELAY,
+                                                                                        DEF_DEFAULT_SYNC_DELAY);
   }
 
   /**
@@ -247,23 +249,37 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
 
   /**
    * Utility method to check for common problems with API responses.  The current list of common problems are:
-   *
+   * <p>
    * <ul>
-   *   <li>A return code other than 200.</li>
-   *   <li>A null data response.</li>
+   * <li>A return code other than 200.</li>
+   * <li>A null data response.</li>
    * </ul>
    *
    * @param response the API response to check.
    * @throws IOException if a common problem is found in the response.
    */
   protected static void checkCommonProblems(ApiResponse<?> response) throws IOException {
-    if (response.getStatusCode() != HttpStatus.SC_OK) throw new IOException("Unexpected return code: " + response.getStatusCode());
+    if (response.getStatusCode() != HttpStatus.SC_OK)
+      throw new IOException("Unexpected return code: " + response.getStatusCode());
     if (response.getData() == null) throw new IOException("Response data is null");
+  }
+
+  /**
+   * Retrieve context to be stored with the next tracker we create for this synchronizer.
+   * Context is only attached if the current synchronization succeeds.  Otherwise, the
+   * context for the next tracker is left at null.  Subclasses should override as
+   * appropriate.
+   *
+   * @return the context to be attached to the next tracker.
+   */
+  protected String getNextSyncContext() {
+    return null;
   }
 
   /**
    * {@inheritDoc}
    */
+  @SuppressWarnings("Duplicates")
   @Override
   public void synch(ESIRefClientProvider cp) {
     log.fine("Starting synchronization: " + getContext());
@@ -305,6 +321,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
       // Set syncTime to the start of the current tracker
       long syncTime = tracker.getSyncStart();
       long nextEvent;
+      String nextContext;
 
       try {
         // Retrieve server and process server data.  Any client or processing
@@ -317,32 +334,36 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
         nextEvent = serverData.getExpiryTime();
         log.fine("Processing server data: " + getContext());
         processServerData(syncTime, serverData, updateList);
+        nextContext = getNextSyncContext();
 
         // Commit all updates.  We process updates in batches with sizes that can be varied dynamically by the
         // admin as needed.  Smaller batches prevent long running transactions from tying up contended resources.
         log.fine("Storing updates: " + getContext());
-        int batchSize = PersistentProperty.getIntegerPropertyWithFallback(PROP_REF_COMMIT_BATCH_SIZE, DEF_REF_COMMIT_BATCH_SIZE);
+        int batchSize = PersistentProperty.getIntegerPropertyWithFallback(PROP_REF_COMMIT_BATCH_SIZE,
+                                                                          DEF_REF_COMMIT_BATCH_SIZE);
         int count = updateList.size();
         if (count > 0) {
           log.fine("Processing " + updateList.size() + " total updates: " + getContext());
-          for (int i = 0, endIndex = Math.min(i + batchSize, count); i < count; i = endIndex, endIndex = Math.min(i + batchSize, count)) {
+          for (int i = 0, endIndex = Math.min(i + batchSize, count); i < count; i = endIndex, endIndex = Math.min(
+              i + batchSize, count)) {
             List<RefCachedData> nextBlock = updateList.subList(i, endIndex);
             try {
-              EveKitRefDataProvider.getFactory().runTransaction(() -> {
-                // Handle next block of commits.
-                log.fine("Processing " + nextBlock.size() + " updates: " + getContext());
-                long start = OrbitalProperties.getCurrentTime();
-                for (RefCachedData obj : nextBlock) {
-                    commit(syncTime, obj);
-                }
-                long end = OrbitalProperties.getCurrentTime();
-                if (log.isLoggable(Level.FINE)) {
-                  // Commit commit rate if FINE if debugging
-                  long delay = end - start;
-                  double rate = delay / (double) nextBlock.size();
-                  log.fine("Process rate = " + rate + " milliseconds/update: " + getContext());
-                }
-              });
+              EveKitRefDataProvider.getFactory()
+                                   .runTransaction(() -> {
+                                     // Handle next block of commits.
+                                     log.fine("Processing " + nextBlock.size() + " updates: " + getContext());
+                                     long start = OrbitalProperties.getCurrentTime();
+                                     for (RefCachedData obj : nextBlock) {
+                                       commit(syncTime, obj);
+                                     }
+                                     long end = OrbitalProperties.getCurrentTime();
+                                     if (log.isLoggable(Level.FINE)) {
+                                       // Commit commit rate if FINE if debugging
+                                       long delay = end - start;
+                                       double rate = delay / (double) nextBlock.size();
+                                       log.fine("Process rate = " + rate + " milliseconds/update: " + getContext());
+                                     }
+                                   });
             } catch (Exception e) {
               if (e.getCause() instanceof IOException) throw (IOException) e.getCause();
               log.log(Level.SEVERE, "query error: " + getContext(), e);
@@ -358,6 +379,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
         // Client error while updating, mark the error in the tracker and exit
         log.log(Level.WARNING, "ESI client error: " + getContext(), e);
         nextEvent = -1;
+        nextContext = null;
         tracker.setStatus(ESISyncState.ERROR);
         tracker.setDetail("ESI client error, contact the site admin if this problem persists");
       } catch (IOException e) {
@@ -365,6 +387,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
         // Database errors during the update should end up here.
         log.log(Level.WARNING, "Error during update: " + getContext(), e);
         nextEvent = -1;
+        nextContext = null;
         tracker.setStatus(ESISyncState.ERROR);
         tracker.setDetail("Server error, contact the site admin if this problem persists");
       }
@@ -374,7 +397,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
 
       // Schedule the next event
       nextEvent = nextEvent < 0 ? defaultNextEvent() : nextEvent;
-      ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(endpoint(), nextEvent);
+      ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(endpoint(), nextEvent, nextContext);
 
     } catch (TrackerNotFoundException e) {
       // No action to take, exit
@@ -388,17 +411,17 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
   // Convenience methods for dealing with missing data from api calls
   public static int nullSafeInteger(Integer value, int def) {
     if (value == null) return def;
-    return value.intValue();
+    return value;
   }
 
   public static long nullSafeLong(Long value, long def) {
     if (value == null) return def;
-    return value.longValue();
+    return value;
   }
 
   public static float nullSafeFloat(Float value, float def) {
     if (value == null) return def;
-    return value.floatValue();
+    return value;
   }
 
   public static DateTime nullSafeDateTime(DateTime value, DateTime def) {

@@ -67,7 +67,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
     super.setup();
 
     // Prepare a test sync tracker
-    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_FW_FACTION_LEADERBOARD, 1234L);
+    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_FW_FACTION_LEADERBOARD, 1234L, null);
 
     // Initialize time keeper
     OrbitalProperties.setTimeGenerator(() -> testTime);

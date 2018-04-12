@@ -58,7 +58,7 @@ public class ESISovereigntyStructureSyncTest extends RefTestBase {
     super.setup();
 
     // Prepare a test sync tracker
-    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_SOV_STRUCTURE, 1234L);
+    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_SOV_STRUCTURE, 1234L, null);
 
     // Initialize time keeper
     OrbitalProperties.setTimeGenerator(() -> testTime);

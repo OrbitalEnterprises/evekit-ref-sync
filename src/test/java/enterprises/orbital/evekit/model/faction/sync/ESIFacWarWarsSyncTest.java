@@ -47,7 +47,7 @@ public class ESIFacWarWarsSyncTest extends RefTestBase {
     super.setup();
 
     // Prepare a test sync tracker
-    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_FW_WARS, 1234L);
+    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_FW_WARS, 1234L, null);
 
     // Initialize time keeper
     OrbitalProperties.setTimeGenerator(() -> testTime);

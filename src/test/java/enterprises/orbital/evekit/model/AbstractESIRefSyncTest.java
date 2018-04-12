@@ -90,7 +90,7 @@ public class AbstractESIRefSyncTest extends RefTestBase {
     super.setup();
 
     // Prepare a test sync tracker
-    tracker = ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_SERVER_STATUS, 1234L);
+    tracker = ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_SERVER_STATUS, 1234L, null);
   }
 
   @Override

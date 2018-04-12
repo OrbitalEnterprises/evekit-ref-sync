@@ -47,7 +47,8 @@ public class ESIAllianceSyncTest extends RefTestBase {
     int size = 20 + TestBase.getRandomInt(20);
     allianceTestData = new Object[size][8];
     for (int i = 0; i < size; i++) {
-      allianceTestData[i][0] = TestBase.getUniqueRandomInteger();
+      // Make sure alliance always ends in 0 to be included in the batch
+      allianceTestData[i][0] = (TestBase.getUniqueRandomInteger() / 10) * 10;
       allianceTestData[i][1] = TestBase.getRandomInt();
       allianceTestData[i][2] = TestBase.getRandomText(50);
       allianceTestData[i][3] = TestBase.getRandomText(50);
@@ -84,7 +85,7 @@ public class ESIAllianceSyncTest extends RefTestBase {
     super.setup();
 
     // Prepare a test sync tracker
-    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_ALLIANCE, 1234L);
+    ESIRefEndpointSyncTracker.getOrCreateUnfinishedTracker(ESIRefSyncEndpoint.REF_ALLIANCE, 1234L, "0");
 
     // Initialize time keeper
     OrbitalProperties.setTimeGenerator(() -> testTime);
@@ -248,7 +249,7 @@ public class ESIAllianceSyncTest extends RefTestBase {
 
     // Verify new tracker was created with next sync time
     syncTracker = ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_ALLIANCE);
-    long schedTime = (new DateTime(2017, 12, 21, 12, 0, 0, DateTimeZone.UTC)).getMillis();
+    long schedTime = testTime + TimeUnit.MILLISECONDS.convert(6, TimeUnit.MINUTES);
     Assert.assertEquals(schedTime, syncTracker.getScheduled());
   }
 
@@ -370,7 +371,7 @@ public class ESIAllianceSyncTest extends RefTestBase {
 
     // Verify new tracker was created with next sync time
     syncTracker = ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_ALLIANCE);
-    long schedTime = (new DateTime(2017, 12, 21, 12, 0, 0, DateTimeZone.UTC)).getMillis();
+    long schedTime = testTime + TimeUnit.MILLISECONDS.convert(6, TimeUnit.MINUTES);
     Assert.assertEquals(schedTime, syncTracker.getScheduled());
   }
 
