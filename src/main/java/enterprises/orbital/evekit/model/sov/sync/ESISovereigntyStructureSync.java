@@ -39,6 +39,7 @@ public class ESISovereigntyStructureSync extends AbstractESIRefSync<List<GetSove
   protected ESIRefServerResult<List<GetSovereigntyStructures200Ok>> getServerData(
       ESIRefClientProvider cp) throws ApiException, IOException {
     SovereigntyApi apiInstance = cp.getSovereigntyApi();
+    ESIRefThrottle.throttle(endpoint().name());
     ApiResponse<List<GetSovereigntyStructures200Ok>> result = apiInstance.getSovereigntyStructuresWithHttpInfo(null,
                                                                                                                null,
                                                                                                                null);

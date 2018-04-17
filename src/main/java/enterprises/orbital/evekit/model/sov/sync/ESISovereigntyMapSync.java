@@ -36,6 +36,7 @@ public class ESISovereigntyMapSync extends AbstractESIRefSync<List<GetSovereignt
   protected ESIRefServerResult<List<GetSovereigntyMap200Ok>> getServerData(
       ESIRefClientProvider cp) throws ApiException, IOException {
     SovereigntyApi apiInstance = cp.getSovereigntyApi();
+    ESIRefThrottle.throttle(endpoint().name());
     ApiResponse<List<GetSovereigntyMap200Ok>> result = apiInstance.getSovereigntyMapWithHttpInfo(null, null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
@@ -63,11 +64,6 @@ public class ESISovereigntyMapSync extends AbstractESIRefSync<List<GetSovereignt
         updates.add(next);
       }
     }
-  }
-
-  @Override
-  public ESIRefEndpointSyncTracker getCurrentTracker() throws IOException, TrackerNotFoundException {
-    return ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_SOV_MAP);
   }
 
 }

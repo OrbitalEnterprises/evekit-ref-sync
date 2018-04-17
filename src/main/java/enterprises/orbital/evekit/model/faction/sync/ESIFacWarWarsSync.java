@@ -37,6 +37,7 @@ public class ESIFacWarWarsSync extends AbstractESIRefSync<List<GetFwWars200Ok>> 
   protected ESIRefServerResult<List<GetFwWars200Ok>> getServerData(
       ESIRefClientProvider cp) throws ApiException, IOException {
     FactionWarfareApi apiInstance = cp.getFactionWarfareApi();
+    ESIRefThrottle.throttle(endpoint().name());
     ApiResponse<List<GetFwWars200Ok>> result = apiInstance.getFwWarsWithHttpInfo(null, null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
@@ -61,11 +62,6 @@ public class ESIFacWarWarsSync extends AbstractESIRefSync<List<GetFwWars200Ok>> 
         updates.add(next);
       }
     }
-  }
-
-  @Override
-  public ESIRefEndpointSyncTracker getCurrentTracker() throws IOException, TrackerNotFoundException {
-    return ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_FW_WARS);
   }
 
 }

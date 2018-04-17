@@ -46,6 +46,7 @@ public class ESIFacWarCharacterLeaderboardSync extends AbstractESIRefSync<GetFwL
   protected ESIRefServerResult<GetFwLeaderboardsCharactersOk> getServerData(
       ESIRefClientProvider cp) throws ApiException, IOException {
     FactionWarfareApi apiInstance = cp.getFactionWarfareApi();
+    ESIRefThrottle.throttle(endpoint().name());
     ApiResponse<GetFwLeaderboardsCharactersOk> result = apiInstance.getFwLeaderboardsCharactersWithHttpInfo(null, null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
@@ -134,11 +135,6 @@ public class ESIFacWarCharacterLeaderboardSync extends AbstractESIRefSync<GetFwL
         updates.add(next);
       }
     }
-  }
-
-  @Override
-  public ESIRefEndpointSyncTracker getCurrentTracker() throws IOException, TrackerNotFoundException {
-    return ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_FW_CHAR_LEADERBOARD);
   }
 
 }

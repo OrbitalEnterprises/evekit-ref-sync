@@ -32,7 +32,7 @@ public class ESISovereigntyCampaignSync extends AbstractESIRefSync<List<GetSover
       if (item instanceof SovereigntyCampaign) {
         SovereigntyCampaign api = (SovereigntyCampaign) item;
         existing = SovereigntyCampaign.get(time, api.getCampaignID());
-      } else if (item instanceof SovereigntyCampaignParticipant) {
+      } else {
         SovereigntyCampaignParticipant api = (SovereigntyCampaignParticipant) item;
         existing = SovereigntyCampaignParticipant.get(time, api.getCampaignID(), api.getAllianceID());
       }
@@ -44,6 +44,7 @@ public class ESISovereigntyCampaignSync extends AbstractESIRefSync<List<GetSover
   protected ESIRefServerResult<List<GetSovereigntyCampaigns200Ok>> getServerData(
       ESIRefClientProvider cp) throws ApiException, IOException {
     SovereigntyApi apiInstance = cp.getSovereigntyApi();
+    ESIRefThrottle.throttle(endpoint().name());
     ApiResponse<List<GetSovereigntyCampaigns200Ok>> result = apiInstance.getSovereigntyCampaignsWithHttpInfo(null, null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
@@ -92,11 +93,6 @@ public class ESISovereigntyCampaignSync extends AbstractESIRefSync<List<GetSover
         updates.add(next);
       }
     }
-  }
-
-  @Override
-  public ESIRefEndpointSyncTracker getCurrentTracker() throws IOException, TrackerNotFoundException {
-    return ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_SOV_CAMPAIGN);
   }
 
 }

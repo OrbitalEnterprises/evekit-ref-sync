@@ -32,6 +32,7 @@ public class ESIServerStatusSync extends AbstractESIRefSync<GetStatusOk> {
   @Override
   protected ESIRefServerResult<GetStatusOk> getServerData(ESIRefClientProvider cp) throws ApiException, IOException {
     StatusApi apiInstance = cp.getStatusApi();
+    ESIRefThrottle.throttle(endpoint().name());
     ApiResponse<GetStatusOk> result = apiInstance.getStatusWithHttpInfo(null, null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
@@ -46,11 +47,6 @@ public class ESIServerStatusSync extends AbstractESIRefSync<GetStatusOk> {
     boolean vip = serverData.getVip() == null ? false : serverData.getVip();
     updates.add(new ServerStatus(serverData.getPlayers(), serverData.getStartTime()
                                                                     .getMillis(), serverData.getServerVersion(), vip));
-  }
-
-  @Override
-  public ESIRefEndpointSyncTracker getCurrentTracker() throws IOException, TrackerNotFoundException {
-    return ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_SERVER_STATUS);
   }
 
 }

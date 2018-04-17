@@ -377,6 +377,7 @@ public abstract class AbstractESIRefSync<ServerDataType> implements ESIRefSynchr
         tracker.setDetail("Updated successfully");
       } catch (ApiException e) {
         // Client error while updating, mark the error in the tracker and exit
+        ESIRefThrottle.throttle(e);
         log.log(Level.WARNING, "ESI client error: " + getContext(), e);
         nextEvent = -1;
         nextContext = null;

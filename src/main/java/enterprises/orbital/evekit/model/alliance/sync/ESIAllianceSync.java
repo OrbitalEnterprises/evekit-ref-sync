@@ -95,6 +95,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
     AllianceApi apiInstance = cp.getAllianceApi();
     // Retrieve alliance list
     log.fine(getContext() + " retrieving alliance list");
+    ESIRefThrottle.throttle(endpoint().name());
     ApiResponse<List<Integer>> resultAllianceList = apiInstance.getAlliancesWithHttpInfo(null, null, null);
     checkCommonProblems(resultAllianceList);
     // Hard code expiry to six minutes in the future so that we properly cycle through all the alliances
@@ -113,7 +114,8 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
 
     // Filter alliance list by alliance filter to produce target batch.
     final int allianceBatch = allianceFilter;
-    resultData.allianceList.addAll(resultAllianceList.getData().stream()
+    resultData.allianceList.addAll(resultAllianceList.getData()
+                                                     .stream()
                                                      .filter(x -> (x % 10) == allianceBatch)
                                                      .collect(Collectors.toList()));
     int allianceCount = resultData.allianceList.size();
@@ -141,30 +143,48 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
         allianceIDMap.put(resultKey, nextAlliance);
         cp.getScheduler()
           .submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
-            ApiResponse<GetAlliancesAllianceIdOk> resultAlliance = apiInstance.getAlliancesAllianceIdWithHttpInfo(
-                nextAlliance, null, null, null);
-            checkCommonProblems(resultAlliance);
-            return resultAlliance.getData();
+            try {
+              ESIRefThrottle.throttle(endpoint().name());
+              ApiResponse<GetAlliancesAllianceIdOk> resultAlliance = apiInstance.getAlliancesAllianceIdWithHttpInfo(
+                  nextAlliance, null, null, null);
+              checkCommonProblems(resultAlliance);
+              return resultAlliance.getData();
+            } catch (ApiException e) {
+              ESIRefThrottle.throttle(e);
+              throw e;
+            }
           }));
 
         // Submit alliance icon request
         allianceIDMap.put(resultKey, nextAlliance);
         cp.getScheduler()
           .submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
-            ApiResponse<GetAlliancesAllianceIdIconsOk> resultIcons = apiInstance.getAlliancesAllianceIdIconsWithHttpInfo(
-                nextAlliance, null, null, null);
-            checkCommonProblems(resultIcons);
-            return resultIcons.getData();
+            try {
+              ESIRefThrottle.throttle(endpoint().name());
+              ApiResponse<GetAlliancesAllianceIdIconsOk> resultIcons = apiInstance.getAlliancesAllianceIdIconsWithHttpInfo(
+                  nextAlliance, null, null, null);
+              checkCommonProblems(resultIcons);
+              return resultIcons.getData();
+            } catch (ApiException e) {
+              ESIRefThrottle.throttle(e);
+              throw e;
+            }
           }));
 
         // Submit alliance corporations request
         allianceIDMap.put(resultKey, nextAlliance);
         cp.getScheduler()
           .submit(new ESICaller<>(asyncCallMap, resultKey++, () -> {
-            ApiResponse<List<Integer>> resultCorpList = apiInstance.getAlliancesAllianceIdCorporationsWithHttpInfo(
-                nextAlliance, null, null, null);
-            checkCommonProblems(resultCorpList);
-            return resultCorpList.getData();
+            try {
+              ESIRefThrottle.throttle(endpoint().name());
+              ApiResponse<List<Integer>> resultCorpList = apiInstance.getAlliancesAllianceIdCorporationsWithHttpInfo(
+                  nextAlliance, null, null, null);
+              checkCommonProblems(resultCorpList);
+              return resultCorpList.getData();
+            } catch (ApiException e) {
+              ESIRefThrottle.throttle(e);
+              throw e;
+            }
           }));
       }
       synchronized (asyncCallMap) {
@@ -300,11 +320,6 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
         }
       }
     }
-  }
-
-  @Override
-  public ESIRefEndpointSyncTracker getCurrentTracker() throws IOException, TrackerNotFoundException {
-    return ESIRefEndpointSyncTracker.getUnfinishedTracker(ESIRefSyncEndpoint.REF_ALLIANCE);
   }
 
 }
