@@ -37,7 +37,7 @@ public class ESISovereigntyMapSync extends AbstractESIRefSync<List<GetSovereignt
       ESIRefClientProvider cp) throws ApiException, IOException {
     SovereigntyApi apiInstance = cp.getSovereigntyApi();
     ESIRefThrottle.throttle(endpoint().name());
-    ApiResponse<List<GetSovereigntyMap200Ok>> result = apiInstance.getSovereigntyMapWithHttpInfo(null, null, null);
+    ApiResponse<List<GetSovereigntyMap200Ok>> result = apiInstance.getSovereigntyMapWithHttpInfo(null, null, null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
   }

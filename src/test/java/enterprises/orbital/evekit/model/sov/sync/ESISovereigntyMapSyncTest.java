@@ -89,7 +89,7 @@ public class ESISovereigntyMapSyncTest extends RefTestBase {
     }
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
     ApiResponse<List<GetSovereigntyMap200Ok>> sovereigntyMapListResponse = new ApiResponse<>(200, headers, sovereigntyMapList);
-    EasyMock.expect(mockEndpoint.getSovereigntyMapWithHttpInfo(null, null, null))
+    EasyMock.expect(mockEndpoint.getSovereigntyMapWithHttpInfo(null, null, null, null))
             .andReturn(sovereigntyMapListResponse);
 
     // Finally, setup client provider mock

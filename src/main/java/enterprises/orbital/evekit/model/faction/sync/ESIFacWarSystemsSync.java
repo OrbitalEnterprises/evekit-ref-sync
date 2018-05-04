@@ -37,7 +37,7 @@ public class ESIFacWarSystemsSync extends AbstractESIRefSync<List<GetFwSystems20
       ESIRefClientProvider cp) throws ApiException, IOException {
     FactionWarfareApi apiInstance = cp.getFactionWarfareApi();
     ESIRefThrottle.throttle(endpoint().name());
-    ApiResponse<List<GetFwSystems200Ok>> result = apiInstance.getFwSystemsWithHttpInfo(null, null, null);
+    ApiResponse<List<GetFwSystems200Ok>> result = apiInstance.getFwSystemsWithHttpInfo(null, null, null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
   }

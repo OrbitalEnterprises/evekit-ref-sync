@@ -45,7 +45,7 @@ public class ESISovereigntyCampaignSync extends AbstractESIRefSync<List<GetSover
       ESIRefClientProvider cp) throws ApiException, IOException {
     SovereigntyApi apiInstance = cp.getSovereigntyApi();
     ESIRefThrottle.throttle(endpoint().name());
-    ApiResponse<List<GetSovereigntyCampaigns200Ok>> result = apiInstance.getSovereigntyCampaignsWithHttpInfo(null, null, null);
+    ApiResponse<List<GetSovereigntyCampaigns200Ok>> result = apiInstance.getSovereigntyCampaignsWithHttpInfo(null, null, null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
   }

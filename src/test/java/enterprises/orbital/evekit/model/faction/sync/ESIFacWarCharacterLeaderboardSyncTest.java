@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("Duplicates")
 public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
 
   // Local mocks and other objects
@@ -28,7 +29,7 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
   private FactionWarfareApi mockEndpoint;
   private long testTime = 1238L;
 
-  static StatAttribute[] attChoices = new StatAttribute[]{
+  private static StatAttribute[] attChoices = new StatAttribute[]{
       StatAttribute.LAST_WEEK, StatAttribute.TOTAL, StatAttribute.YESTERDAY
   };
 
@@ -162,8 +163,9 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
 
     // Setup call
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
-    ApiResponse<GetFwLeaderboardsCharactersOk> charLeaderboardsResponse = new ApiResponse<>(200, headers, charLeaderboard);
-    EasyMock.expect(mockEndpoint.getFwLeaderboardsCharactersWithHttpInfo(null, null, null))
+    ApiResponse<GetFwLeaderboardsCharactersOk> charLeaderboardsResponse = new ApiResponse<>(200, headers,
+                                                                                            charLeaderboard);
+    EasyMock.expect(mockEndpoint.getFwLeaderboardsCharactersWithHttpInfo(null, null, null, null))
             .andReturn(charLeaderboardsResponse);
 
     // Finally, setup client provider mock
@@ -199,10 +201,20 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
 
   private void verifyDataUpdate() throws Exception {
     // Retrieve all stored faction stats and victory points data
-    List<CharacterKillStat> storedKills = AbstractESIRefSync.retrieveAll(testTime, (long contid, AttributeSelector at) ->
-        CharacterKillStat.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
-    List<CharacterVictoryPointStat> storedVPs = AbstractESIRefSync.retrieveAll(testTime, (long contid, AttributeSelector at) ->
-        CharacterVictoryPointStat.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
+    List<CharacterKillStat> storedKills = AbstractESIRefSync.retrieveAll(testTime,
+                                                                         (long contid, AttributeSelector at) ->
+                                                                             CharacterKillStat.accessQuery(contid, 1000,
+                                                                                                           false, at,
+                                                                                                           AbstractESIRefSync.ANY_SELECTOR,
+                                                                                                           AbstractESIRefSync.ANY_SELECTOR,
+                                                                                                           AbstractESIRefSync.ANY_SELECTOR));
+    List<CharacterVictoryPointStat> storedVPs = AbstractESIRefSync.retrieveAll(testTime,
+                                                                               (long contid, AttributeSelector at) ->
+                                                                                   CharacterVictoryPointStat.accessQuery(
+                                                                                       contid, 1000, false, at,
+                                                                                       AbstractESIRefSync.ANY_SELECTOR,
+                                                                                       AbstractESIRefSync.ANY_SELECTOR,
+                                                                                       AbstractESIRefSync.ANY_SELECTOR));
 
     // Check data matches test data
     Assert.assertEquals(charLeaderboardKillsTestData.length, storedKills.size());
@@ -285,7 +297,8 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     verifyDataUpdate();
 
     // Verify tracker was updated properly
-    ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(ESIRefSyncEndpoint.REF_FW_CHAR_LEADERBOARD);
+    ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(
+        ESIRefSyncEndpoint.REF_FW_CHAR_LEADERBOARD);
     Assert.assertEquals(1234L, syncTracker.getScheduled());
     Assert.assertEquals(testTime, syncTracker.getSyncStart());
     Assert.assertEquals(ESISyncState.FINISHED, syncTracker.getStatus());
@@ -324,15 +337,16 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     // Populate existing stats
     for (int i = 0; i < charLeaderboardKillsTestData.length; i++) {
       CharacterKillStat newStat = new CharacterKillStat((StatAttribute) charLeaderboardKillsTestData[i][1],
-                                                            (Integer) charLeaderboardKillsTestData[i][2] + 1,
-                                                            modifiedKillsCharacterIDs[i]);
+                                                        (Integer) charLeaderboardKillsTestData[i][2] + 1,
+                                                        modifiedKillsCharacterIDs[i]);
       newStat.setup(testTime - 1);
       RefCachedData.update(newStat);
     }
     for (int i = 0; i < charLeaderboardVPsTestData.length; i++) {
-      CharacterVictoryPointStat newStat = new CharacterVictoryPointStat((StatAttribute) charLeaderboardVPsTestData[i][1],
-                                                                            (Integer) charLeaderboardVPsTestData[i][2] + 1,
-                                                                            modifiedVPsCharacterIDs[i]);
+      CharacterVictoryPointStat newStat = new CharacterVictoryPointStat(
+          (StatAttribute) charLeaderboardVPsTestData[i][1],
+          (Integer) charLeaderboardVPsTestData[i][2] + 1,
+          modifiedVPsCharacterIDs[i]);
       newStat.setup(testTime - 1);
       RefCachedData.update(newStat);
     }
@@ -343,10 +357,20 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     EasyMock.verify(mockServer, mockEndpoint);
 
     // Verify old objects were evolved properly
-    List<CharacterKillStat> oldKills = AbstractESIRefSync.retrieveAll(testTime - 1, (long contid, AttributeSelector at) ->
-        CharacterKillStat.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
-    List<CharacterVictoryPointStat> oldVPs = AbstractESIRefSync.retrieveAll(testTime - 1, (long contid, AttributeSelector at) ->
-        CharacterVictoryPointStat.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
+    List<CharacterKillStat> oldKills = AbstractESIRefSync.retrieveAll(testTime - 1,
+                                                                      (long contid, AttributeSelector at) ->
+                                                                          CharacterKillStat.accessQuery(contid, 1000,
+                                                                                                        false, at,
+                                                                                                        AbstractESIRefSync.ANY_SELECTOR,
+                                                                                                        AbstractESIRefSync.ANY_SELECTOR,
+                                                                                                        AbstractESIRefSync.ANY_SELECTOR));
+    List<CharacterVictoryPointStat> oldVPs = AbstractESIRefSync.retrieveAll(testTime - 1,
+                                                                            (long contid, AttributeSelector at) ->
+                                                                                CharacterVictoryPointStat.accessQuery(
+                                                                                    contid, 1000, false, at,
+                                                                                    AbstractESIRefSync.ANY_SELECTOR,
+                                                                                    AbstractESIRefSync.ANY_SELECTOR,
+                                                                                    AbstractESIRefSync.ANY_SELECTOR));
 
     // Check data matches test data
     Assert.assertEquals(charLeaderboardKillsTestData.length, oldKills.size());
@@ -372,7 +396,8 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     verifyDataUpdate();
 
     // Verify tracker was updated properly
-    ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(ESIRefSyncEndpoint.REF_FW_CHAR_LEADERBOARD);
+    ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(
+        ESIRefSyncEndpoint.REF_FW_CHAR_LEADERBOARD);
     Assert.assertEquals(1234L, syncTracker.getScheduled());
     Assert.assertEquals(testTime, syncTracker.getSyncStart());
     Assert.assertEquals(ESISyncState.FINISHED, syncTracker.getStatus());

@@ -42,6 +42,7 @@ public class ESISovereigntyStructureSync extends AbstractESIRefSync<List<GetSove
     ESIRefThrottle.throttle(endpoint().name());
     ApiResponse<List<GetSovereigntyStructures200Ok>> result = apiInstance.getSovereigntyStructuresWithHttpInfo(null,
                                                                                                                null,
+                                                                                                               null,
                                                                                                                null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()),

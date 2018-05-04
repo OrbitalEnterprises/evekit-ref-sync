@@ -13,14 +13,15 @@ import enterprises.orbital.evekit.model.alliance.AllianceIcon;
 import enterprises.orbital.evekit.model.alliance.AllianceMemberCorporation;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class ESIAllianceSyncTest extends RefTestBase {
@@ -30,9 +31,9 @@ public class ESIAllianceSyncTest extends RefTestBase {
   private AllianceApi mockEndpoint;
   private long testTime = 1238L;
 
-  private static Object[][]   allianceTestData;
-  private static Object[][]   allianceIconTestData;
-  private static Object[][]   allianceMemberTestData;
+  private static Object[][] allianceTestData;
+  private static Object[][] allianceIconTestData;
+  private static Object[][] allianceMemberTestData;
 
   static {
     // Alliance test data
@@ -126,7 +127,8 @@ public class ESIAllianceSyncTest extends RefTestBase {
     }
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
     ApiResponse<List<Integer>> allianceListResponse = new ApiResponse<>(200, headers, allianceList);
-    EasyMock.expect(mockEndpoint.getAlliancesWithHttpInfo(null, null, null)).andReturn(allianceListResponse);
+    EasyMock.expect(mockEndpoint.getAlliancesWithHttpInfo(null, null, null, null))
+            .andReturn(allianceListResponse);
 
     // Setup calls to request individual alliance info
     for (Object[] testData : allianceTestData) {
@@ -140,7 +142,8 @@ public class ESIAllianceSyncTest extends RefTestBase {
       allianceData.setCreatorCorporationId((Integer) testData[6]);
       allianceData.setFactionId((Integer) testData[7]);
       ApiResponse<GetAlliancesAllianceIdOk> nextAllianceResponse = new ApiResponse<>(200, headers, allianceData);
-      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdWithHttpInfo(allianceID, null, null, null)).andReturn(nextAllianceResponse);
+      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdWithHttpInfo(allianceID, null, null, null, null))
+              .andReturn(nextAllianceResponse);
     }
 
     // Setup calls to request alliance icon info
@@ -150,7 +153,8 @@ public class ESIAllianceSyncTest extends RefTestBase {
       iconData.setPx64x64((String) allianceIconTestData[i][1]);
       iconData.setPx128x128((String) allianceIconTestData[i][2]);
       ApiResponse<GetAlliancesAllianceIdIconsOk> nextIconResponse = new ApiResponse<>(200, headers, iconData);
-      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdIconsWithHttpInfo(allianceID, null, null, null)).andReturn(nextIconResponse);
+      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdIconsWithHttpInfo(allianceID, null, null, null, null))
+              .andReturn(nextIconResponse);
     }
 
     // Setup calls to request alliance corporation lists
@@ -163,7 +167,8 @@ public class ESIAllianceSyncTest extends RefTestBase {
         }
       }
       ApiResponse<List<Integer>> nextCorpResponse = new ApiResponse<>(200, headers, corpList);
-      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdCorporationsWithHttpInfo(allianceID, null, null, null)).andReturn(nextCorpResponse);
+      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdCorporationsWithHttpInfo(allianceID, null, null, null, null))
+              .andReturn(nextCorpResponse);
     }
 
     // Setup an ExecutorService which immediately executes any submitted runnable
@@ -171,21 +176,33 @@ public class ESIAllianceSyncTest extends RefTestBase {
 
     // Finally, setup client provider mock
     mockServer = EasyMock.createMock(ESIRefClientProvider.class);
-    EasyMock.expect(mockServer.getScheduler()).andReturn(immediateExecutor).anyTimes();
-    EasyMock.expect(mockServer.getAllianceApi()).andReturn(mockEndpoint).anyTimes();
+    EasyMock.expect(mockServer.getScheduler())
+            .andReturn(immediateExecutor)
+            .anyTimes();
+    EasyMock.expect(mockServer.getAllianceApi())
+            .andReturn(mockEndpoint)
+            .anyTimes();
   }
 
   private void verifyDataUpdate() throws Exception {
     // Retrieve all stored alliance data (alliances, icons and members)
     List<Alliance> storedAlliances = AbstractESIRefSync.retrieveAll(testTime, (long contid, AttributeSelector at) ->
-        Alliance.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
-                             AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
+        Alliance.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
+                             AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
+                             AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
+                             AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
+                             AbstractESIRefSync.ANY_SELECTOR));
 
     List<AllianceIcon> storedIcons = AbstractESIRefSync.retrieveAll(testTime, (long contid, AttributeSelector at) ->
-        AllianceIcon.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
+        AllianceIcon.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR,
+                                 AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
 
-    List<AllianceMemberCorporation> storedMembers = AbstractESIRefSync.retrieveAll(testTime, (long contid, AttributeSelector at) ->
-        AllianceMemberCorporation.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
+    List<AllianceMemberCorporation> storedMembers = AbstractESIRefSync.retrieveAll(testTime,
+                                                                                   (long contid, AttributeSelector at) ->
+                                                                                       AllianceMemberCorporation.accessQuery(
+                                                                                           contid, 1000, false, at,
+                                                                                           AbstractESIRefSync.ANY_SELECTOR,
+                                                                                           AbstractESIRefSync.ANY_SELECTOR));
 
     // Check data matches test data
     Assert.assertEquals(allianceTestData.length, storedAlliances.size());
@@ -198,7 +215,9 @@ public class ESIAllianceSyncTest extends RefTestBase {
       long allianceID = nextAlliance.getAllianceID();
       Assert.assertEquals((int) (Integer) allianceTestData[i][0], nextAlliance.getAllianceID());
       Assert.assertEquals((int) (Integer) allianceTestData[i][1], nextAlliance.getExecutorCorpID());
-      int memberCount = (int) Arrays.stream(allianceMemberTestData).filter(x -> ((Integer) x[0]).longValue() == allianceID).count();
+      int memberCount = (int) Arrays.stream(allianceMemberTestData)
+                                    .filter(x -> ((Integer) x[0]).longValue() == allianceID)
+                                    .count();
       Assert.assertEquals(memberCount, nextAlliance.getMemberCount());
       Assert.assertEquals(allianceTestData[i][2], nextAlliance.getName());
       Assert.assertEquals(allianceTestData[i][3], nextAlliance.getShortName());
@@ -220,9 +239,16 @@ public class ESIAllianceSyncTest extends RefTestBase {
     for (int i = 0; i < allianceTestData.length; i++) {
       Alliance nextAlliance = storedAlliances.get(i);
       long allianceID = nextAlliance.getAllianceID();
-      Set<Long> testCorpMembers = Arrays.stream(allianceMemberTestData).filter(x -> ((Integer) x[0]).longValue() == allianceID).map(x -> ((Integer) x[1]).longValue()).collect(Collectors.toSet());
-      Set<Long> storedCorpMembers = storedMembers.stream().filter(x -> x.getAllianceID() == allianceID).map(AllianceMemberCorporation::getCorporationID).collect(Collectors.toSet());
-      Assert.assertTrue(testCorpMembers.size() == storedCorpMembers.size() && testCorpMembers.containsAll(storedCorpMembers));
+      Set<Long> testCorpMembers = Arrays.stream(allianceMemberTestData)
+                                        .filter(x -> ((Integer) x[0]).longValue() == allianceID)
+                                        .map(x -> ((Integer) x[1]).longValue())
+                                        .collect(Collectors.toSet());
+      Set<Long> storedCorpMembers = storedMembers.stream()
+                                                 .filter(x -> x.getAllianceID() == allianceID)
+                                                 .map(AllianceMemberCorporation::getCorporationID)
+                                                 .collect(Collectors.toSet());
+      Assert.assertTrue(
+          testCorpMembers.size() == storedCorpMembers.size() && testCorpMembers.containsAll(storedCorpMembers));
     }
   }
 
@@ -240,7 +266,8 @@ public class ESIAllianceSyncTest extends RefTestBase {
     verifyDataUpdate();
 
     // Verify tracker was updated properly
-    ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(ESIRefSyncEndpoint.REF_ALLIANCE);
+    ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(
+        ESIRefSyncEndpoint.REF_ALLIANCE);
     Assert.assertEquals(1234L, syncTracker.getScheduled());
     Assert.assertEquals(testTime, syncTracker.getSyncStart());
     Assert.assertEquals(ESISyncState.FINISHED, syncTracker.getStatus());
@@ -272,18 +299,21 @@ public class ESIAllianceSyncTest extends RefTestBase {
     int[] memberCounts = new int[allianceTestData.length];
     for (int i = 0; i < memberCounts.length; i++) {
       int allianceID = (int) (Integer) allianceTestData[i][0];
-      memberCounts[i] = (int) Arrays.stream(allianceMemberTestData).filter(x -> allianceID == (Integer) x[0]).count();
+      memberCounts[i] = (int) Arrays.stream(allianceMemberTestData)
+                                    .filter(x -> allianceID == (Integer) x[0])
+                                    .count();
     }
     // Populate existing alliances and icons
     for (int i = 0; i < allianceTestData.length; i++) {
       Alliance newAlliance = new Alliance(modifiedAllianceIDs[i], (Integer) allianceTestData[i][1] + 1,
                                           memberCounts[i], allianceTestData[i][2] + "1", allianceTestData[i][3] + "1",
-                                          (Long) allianceTestData[i][4] + 1,(Integer) allianceTestData[i][5] + 1,
+                                          (Long) allianceTestData[i][4] + 1, (Integer) allianceTestData[i][5] + 1,
                                           (Integer) allianceTestData[i][6] + 1, (Integer) allianceTestData[i][7] + 1);
       newAlliance.setup(testTime - 1);
       RefCachedData.update(newAlliance);
 
-      AllianceIcon newIcon = new AllianceIcon(modifiedAllianceIDs[i], allianceIconTestData[i][1] + "1", allianceIconTestData[i][2] + "1");
+      AllianceIcon newIcon = new AllianceIcon(modifiedAllianceIDs[i], allianceIconTestData[i][1] + "1",
+                                              allianceIconTestData[i][2] + "1");
       newIcon.setup(testTime - 1);
       RefCachedData.update(newIcon);
     }
@@ -292,7 +322,8 @@ public class ESIAllianceSyncTest extends RefTestBase {
       // Make half the existing data have unseen corporation IDs. These items should be removed during the sync
       // since they will not be returned from the API.
       int nextAllianceID = modifiedAllianceIDs[i % modifiedAllianceIDs.length];
-      AllianceMemberCorporation newMember = new AllianceMemberCorporation(nextAllianceID, (Integer) allianceMemberTestData[i][1] + 1);
+      AllianceMemberCorporation newMember = new AllianceMemberCorporation(nextAllianceID,
+                                                                          (Integer) allianceMemberTestData[i][1] + 1);
       newMember.setup(testTime - 1);
       RefCachedData.update(newMember);
     }
@@ -304,14 +335,22 @@ public class ESIAllianceSyncTest extends RefTestBase {
 
     // Verify old objects were evolved properly
     List<Alliance> oldAlliances = AbstractESIRefSync.retrieveAll(testTime - 1, (long contid, AttributeSelector at) ->
-        Alliance.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
-                             AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
+        Alliance.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
+                             AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
+                             AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
+                             AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR,
+                             AbstractESIRefSync.ANY_SELECTOR));
 
     List<AllianceIcon> oldIcons = AbstractESIRefSync.retrieveAll(testTime - 1, (long contid, AttributeSelector at) ->
-        AllianceIcon.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
+        AllianceIcon.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR,
+                                 AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
 
-    List<AllianceMemberCorporation> oldMembers = AbstractESIRefSync.retrieveAll(testTime - 1, (long contid, AttributeSelector at) ->
-        AllianceMemberCorporation.accessQuery(contid, 1000, false, at, AbstractESIRefSync.ANY_SELECTOR, AbstractESIRefSync.ANY_SELECTOR));
+    List<AllianceMemberCorporation> oldMembers = AbstractESIRefSync.retrieveAll(testTime - 1,
+                                                                                (long contid, AttributeSelector at) ->
+                                                                                    AllianceMemberCorporation.accessQuery(
+                                                                                        contid, 1000, false, at,
+                                                                                        AbstractESIRefSync.ANY_SELECTOR,
+                                                                                        AbstractESIRefSync.ANY_SELECTOR));
 
     // Check data matches test data
     Assert.assertEquals(allianceTestData.length, oldAlliances.size());
@@ -353,7 +392,10 @@ public class ESIAllianceSyncTest extends RefTestBase {
         if (modifiedAllianceIDs[j % allianceTestData.length] == allianceID)
           testCorpMembers.add((long) (Integer) allianceMemberTestData[j][1] + 1);
       }
-      Set<Long> storedCorpMembers = oldMembers.stream().filter(x -> x.getAllianceID() == allianceID).map(AllianceMemberCorporation::getCorporationID).collect(Collectors.toSet());
+      Set<Long> storedCorpMembers = oldMembers.stream()
+                                              .filter(x -> x.getAllianceID() == allianceID)
+                                              .map(AllianceMemberCorporation::getCorporationID)
+                                              .collect(Collectors.toSet());
       Assert.assertEquals(testCorpMembers.size(), storedCorpMembers.size());
       Assert.assertTrue(testCorpMembers.containsAll(storedCorpMembers));
     }
@@ -362,7 +404,8 @@ public class ESIAllianceSyncTest extends RefTestBase {
     verifyDataUpdate();
 
     // Verify tracker was updated properly
-    ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(ESIRefSyncEndpoint.REF_ALLIANCE);
+    ESIRefEndpointSyncTracker syncTracker = ESIRefEndpointSyncTracker.getLatestFinishedTracker(
+        ESIRefSyncEndpoint.REF_ALLIANCE);
     Assert.assertEquals(1234L, syncTracker.getScheduled());
     Assert.assertEquals(testTime, syncTracker.getSyncStart());
     Assert.assertEquals(ESISyncState.FINISHED, syncTracker.getStatus());

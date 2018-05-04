@@ -62,7 +62,7 @@ public class ESIServerStatusSyncTest extends RefTestBase {
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
     ApiResponse<GetStatusOk> apir = new ApiResponse<>(200, headers, gsok);
     mockEndpoint = EasyMock.createMock(StatusApi.class);
-    EasyMock.expect(mockEndpoint.getStatusWithHttpInfo(null, null, null))
+    EasyMock.expect(mockEndpoint.getStatusWithHttpInfo(null, null, null, null))
             .andReturn(apir);
     mockServer = EasyMock.createMock(ESIRefClientProvider.class);
     EasyMock.expect(mockServer.getStatusApi())

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("Duplicates")
 public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
 
   // Local mocks and other objects
@@ -28,7 +29,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
   private FactionWarfareApi mockEndpoint;
   private long testTime = 1238L;
 
-  static StatAttribute[] attChoices = new StatAttribute[]{
+  private static StatAttribute[] attChoices = new StatAttribute[]{
       StatAttribute.LAST_WEEK, StatAttribute.TOTAL, StatAttribute.YESTERDAY
   };
 
@@ -163,7 +164,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
     // Setup call
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
     ApiResponse<GetFwLeaderboardsOk> factionLeaderboardsResponse = new ApiResponse<>(200, headers, factionLeaderboard);
-    EasyMock.expect(mockEndpoint.getFwLeaderboardsWithHttpInfo(null, null, null))
+    EasyMock.expect(mockEndpoint.getFwLeaderboardsWithHttpInfo(null, null, null, null))
             .andReturn(factionLeaderboardsResponse);
 
     // Finally, setup client provider mock
