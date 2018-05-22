@@ -85,16 +85,16 @@ public class ESIFacWarCharacterLeaderboardSync extends AbstractESIRefSync<GetFwL
     List<CharacterKillStat> allKills = new ArrayList<>();
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getActiveTotal(), StatAttribute.TOTAL,
-                                        GetFwLeaderboardsCharactersActiveTotal::getCharacterId,
-                                        GetFwLeaderboardsCharactersActiveTotal::getAmount));
+                                        GetFwLeaderboardsCharactersActiveTotalActiveTotal::getCharacterId,
+                                        GetFwLeaderboardsCharactersActiveTotalActiveTotal::getAmount));
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getLastWeek(), StatAttribute.LAST_WEEK,
-                                        GetFwLeaderboardsCharactersLastWeek::getCharacterId,
-                                        GetFwLeaderboardsCharactersLastWeek::getAmount));
+                                        GetFwLeaderboardsCharactersLastWeekLastWeek::getCharacterId,
+                                        GetFwLeaderboardsCharactersLastWeekLastWeek::getAmount));
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getYesterday(), StatAttribute.YESTERDAY,
-                                        GetFwLeaderboardsCharactersYesterday::getCharacterId,
-                                        GetFwLeaderboardsCharactersYesterday::getAmount));
+                                        GetFwLeaderboardsCharactersYesterdayYesterday::getCharacterId,
+                                        GetFwLeaderboardsCharactersYesterdayYesterday::getAmount));
     for (CharacterKillStat next : allKills) {
       seenCharacterKills.add(Pair.of(next.getAttribute(), next.getCharacterID()));
     }
@@ -104,16 +104,16 @@ public class ESIFacWarCharacterLeaderboardSync extends AbstractESIRefSync<GetFwL
     List<CharacterVictoryPointStat> allVPs = new ArrayList<>();
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getActiveTotal(), StatAttribute.TOTAL,
-                                    GetFwLeaderboardsCharactersActiveTotal1::getCharacterId,
-                                    GetFwLeaderboardsCharactersActiveTotal1::getAmount));
+                                    GetFwLeaderboardsCharactersActiveTotalActiveTotal1::getCharacterId,
+                                    GetFwLeaderboardsCharactersActiveTotalActiveTotal1::getAmount));
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getLastWeek(), StatAttribute.LAST_WEEK,
-                                    GetFwLeaderboardsCharactersLastWeek1::getCharacterId,
-                                    GetFwLeaderboardsCharactersLastWeek1::getAmount));
+                                    GetFwLeaderboardsCharactersLastWeekLastWeek1::getCharacterId,
+                                    GetFwLeaderboardsCharactersLastWeekLastWeek1::getAmount));
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getYesterday(), StatAttribute.YESTERDAY,
-                                    GetFwLeaderboardsCharactersYesterday1::getCharacterId,
-                                    GetFwLeaderboardsCharactersYesterday1::getAmount));
+                                    GetFwLeaderboardsCharactersYesterdayYesterday1::getCharacterId,
+                                    GetFwLeaderboardsCharactersYesterdayYesterday1::getAmount));
     for (CharacterVictoryPointStat next : allVPs) {
       seenCharacterVPs.add(Pair.of(next.getAttribute(), next.getCharacterID()));
     }

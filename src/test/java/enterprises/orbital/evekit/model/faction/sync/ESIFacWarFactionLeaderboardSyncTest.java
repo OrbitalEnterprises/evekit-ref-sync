@@ -108,7 +108,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
     kills.setActiveTotal(Arrays.stream(factionLeaderboardKillsTestData)
                                .filter(x -> x[1] == StatAttribute.TOTAL)
                                .map(x -> {
-                                 GetFwLeaderboardsActiveTotal stat = new GetFwLeaderboardsActiveTotal();
+                                 GetFwLeaderboardsActiveTotalActiveTotal stat = new GetFwLeaderboardsActiveTotalActiveTotal();
                                  stat.setFactionId((Integer) x[0]);
                                  stat.setAmount((Integer) x[2]);
                                  return stat;
@@ -117,7 +117,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
     kills.setLastWeek(Arrays.stream(factionLeaderboardKillsTestData)
                             .filter(x -> x[1] == StatAttribute.LAST_WEEK)
                             .map(x -> {
-                              GetFwLeaderboardsLastWeek stat = new GetFwLeaderboardsLastWeek();
+                              GetFwLeaderboardsLastWeekLastWeek stat = new GetFwLeaderboardsLastWeekLastWeek();
                               stat.setFactionId((Integer) x[0]);
                               stat.setAmount((Integer) x[2]);
                               return stat;
@@ -126,7 +126,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
     kills.setYesterday(Arrays.stream(factionLeaderboardKillsTestData)
                              .filter(x -> x[1] == StatAttribute.YESTERDAY)
                              .map(x -> {
-                               GetFwLeaderboardsYesterday stat = new GetFwLeaderboardsYesterday();
+                               GetFwLeaderboardsYesterdayYesterday stat = new GetFwLeaderboardsYesterdayYesterday();
                                stat.setFactionId((Integer) x[0]);
                                stat.setAmount((Integer) x[2]);
                                return stat;
@@ -136,7 +136,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
     vps.setActiveTotal(Arrays.stream(factionLeaderboardVPsTestData)
                              .filter(x -> x[1] == StatAttribute.TOTAL)
                              .map(x -> {
-                               GetFwLeaderboardsActiveTotal1 stat = new GetFwLeaderboardsActiveTotal1();
+                               GetFwLeaderboardsActiveTotalActiveTotal1 stat = new GetFwLeaderboardsActiveTotalActiveTotal1();
                                stat.setFactionId((Integer) x[0]);
                                stat.setAmount((Integer) x[2]);
                                return stat;
@@ -145,7 +145,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
     vps.setLastWeek(Arrays.stream(factionLeaderboardVPsTestData)
                           .filter(x -> x[1] == StatAttribute.LAST_WEEK)
                           .map(x -> {
-                            GetFwLeaderboardsLastWeek1 stat = new GetFwLeaderboardsLastWeek1();
+                            GetFwLeaderboardsLastWeekLastWeek1 stat = new GetFwLeaderboardsLastWeekLastWeek1();
                             stat.setFactionId((Integer) x[0]);
                             stat.setAmount((Integer) x[2]);
                             return stat;
@@ -154,7 +154,7 @@ public class ESIFacWarFactionLeaderboardSyncTest extends RefTestBase {
     vps.setYesterday(Arrays.stream(factionLeaderboardVPsTestData)
                            .filter(x -> x[1] == StatAttribute.YESTERDAY)
                            .map(x -> {
-                             GetFwLeaderboardsYesterday1 stat = new GetFwLeaderboardsYesterday1();
+                             GetFwLeaderboardsYesterdayYesterday1 stat = new GetFwLeaderboardsYesterdayYesterday1();
                              stat.setFactionId((Integer) x[0]);
                              stat.setAmount((Integer) x[2]);
                              return stat;

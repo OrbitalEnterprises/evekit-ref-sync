@@ -108,7 +108,7 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     kills.setActiveTotal(Arrays.stream(charLeaderboardKillsTestData)
                                .filter(x -> x[1] == StatAttribute.TOTAL)
                                .map(x -> {
-                                 GetFwLeaderboardsCharactersActiveTotal stat = new GetFwLeaderboardsCharactersActiveTotal();
+                                 GetFwLeaderboardsCharactersActiveTotalActiveTotal stat = new GetFwLeaderboardsCharactersActiveTotalActiveTotal();
                                  stat.setCharacterId((Integer) x[0]);
                                  stat.setAmount((Integer) x[2]);
                                  return stat;
@@ -117,7 +117,7 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     kills.setLastWeek(Arrays.stream(charLeaderboardKillsTestData)
                             .filter(x -> x[1] == StatAttribute.LAST_WEEK)
                             .map(x -> {
-                              GetFwLeaderboardsCharactersLastWeek stat = new GetFwLeaderboardsCharactersLastWeek();
+                              GetFwLeaderboardsCharactersLastWeekLastWeek stat = new GetFwLeaderboardsCharactersLastWeekLastWeek();
                               stat.setCharacterId((Integer) x[0]);
                               stat.setAmount((Integer) x[2]);
                               return stat;
@@ -126,7 +126,7 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     kills.setYesterday(Arrays.stream(charLeaderboardKillsTestData)
                              .filter(x -> x[1] == StatAttribute.YESTERDAY)
                              .map(x -> {
-                               GetFwLeaderboardsCharactersYesterday stat = new GetFwLeaderboardsCharactersYesterday();
+                               GetFwLeaderboardsCharactersYesterdayYesterday stat = new GetFwLeaderboardsCharactersYesterdayYesterday();
                                stat.setCharacterId((Integer) x[0]);
                                stat.setAmount((Integer) x[2]);
                                return stat;
@@ -136,7 +136,7 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     vps.setActiveTotal(Arrays.stream(charLeaderboardVPsTestData)
                              .filter(x -> x[1] == StatAttribute.TOTAL)
                              .map(x -> {
-                               GetFwLeaderboardsCharactersActiveTotal1 stat = new GetFwLeaderboardsCharactersActiveTotal1();
+                               GetFwLeaderboardsCharactersActiveTotalActiveTotal1 stat = new GetFwLeaderboardsCharactersActiveTotalActiveTotal1();
                                stat.setCharacterId((Integer) x[0]);
                                stat.setAmount((Integer) x[2]);
                                return stat;
@@ -145,7 +145,7 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     vps.setLastWeek(Arrays.stream(charLeaderboardVPsTestData)
                           .filter(x -> x[1] == StatAttribute.LAST_WEEK)
                           .map(x -> {
-                            GetFwLeaderboardsCharactersLastWeek1 stat = new GetFwLeaderboardsCharactersLastWeek1();
+                            GetFwLeaderboardsCharactersLastWeekLastWeek1 stat = new GetFwLeaderboardsCharactersLastWeekLastWeek1();
                             stat.setCharacterId((Integer) x[0]);
                             stat.setAmount((Integer) x[2]);
                             return stat;
@@ -154,7 +154,7 @@ public class ESIFacWarCharacterLeaderboardSyncTest extends RefTestBase {
     vps.setYesterday(Arrays.stream(charLeaderboardVPsTestData)
                            .filter(x -> x[1] == StatAttribute.YESTERDAY)
                            .map(x -> {
-                             GetFwLeaderboardsCharactersYesterday1 stat = new GetFwLeaderboardsCharactersYesterday1();
+                             GetFwLeaderboardsCharactersYesterdayYesterday1 stat = new GetFwLeaderboardsCharactersYesterdayYesterday1();
                              stat.setCharacterId((Integer) x[0]);
                              stat.setAmount((Integer) x[2]);
                              return stat;

@@ -84,16 +84,16 @@ public class ESIFacWarFactionLeaderboardSync extends AbstractESIRefSync<GetFwLea
     List<FactionKillStat> allKills = new ArrayList<>();
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getActiveTotal(), StatAttribute.TOTAL,
-                                        GetFwLeaderboardsActiveTotal::getFactionId,
-                                        GetFwLeaderboardsActiveTotal::getAmount));
+                                        GetFwLeaderboardsActiveTotalActiveTotal::getFactionId,
+                                        GetFwLeaderboardsActiveTotalActiveTotal::getAmount));
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getLastWeek(), StatAttribute.LAST_WEEK,
-                                        GetFwLeaderboardsLastWeek::getFactionId,
-                                        GetFwLeaderboardsLastWeek::getAmount));
+                                        GetFwLeaderboardsLastWeekLastWeek::getFactionId,
+                                        GetFwLeaderboardsLastWeekLastWeek::getAmount));
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getYesterday(), StatAttribute.YESTERDAY,
-                                        GetFwLeaderboardsYesterday::getFactionId,
-                                        GetFwLeaderboardsYesterday::getAmount));
+                                        GetFwLeaderboardsYesterdayYesterday::getFactionId,
+                                        GetFwLeaderboardsYesterdayYesterday::getAmount));
     for (FactionKillStat next : allKills) {
       seenFactionKills.add(Pair.of(next.getAttribute(), next.getFactionID()));
     }
@@ -103,16 +103,16 @@ public class ESIFacWarFactionLeaderboardSync extends AbstractESIRefSync<GetFwLea
     List<FactionVictoryPointStat> allVPs = new ArrayList<>();
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getActiveTotal(), StatAttribute.TOTAL,
-                                    GetFwLeaderboardsActiveTotal1::getFactionId,
-                                    GetFwLeaderboardsActiveTotal1::getAmount));
+                                    GetFwLeaderboardsActiveTotalActiveTotal1::getFactionId,
+                                    GetFwLeaderboardsActiveTotalActiveTotal1::getAmount));
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getLastWeek(), StatAttribute.LAST_WEEK,
-                                    GetFwLeaderboardsLastWeek1::getFactionId,
-                                    GetFwLeaderboardsLastWeek1::getAmount));
+                                    GetFwLeaderboardsLastWeekLastWeek1::getFactionId,
+                                    GetFwLeaderboardsLastWeekLastWeek1::getAmount));
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getYesterday(), StatAttribute.YESTERDAY,
-                                    GetFwLeaderboardsYesterday1::getFactionId,
-                                    GetFwLeaderboardsYesterday1::getAmount));
+                                    GetFwLeaderboardsYesterdayYesterday1::getFactionId,
+                                    GetFwLeaderboardsYesterdayYesterday1::getAmount));
     for (FactionVictoryPointStat next : allVPs) {
       seenFactionVPs.add(Pair.of(next.getAttribute(), next.getFactionID()));
     }

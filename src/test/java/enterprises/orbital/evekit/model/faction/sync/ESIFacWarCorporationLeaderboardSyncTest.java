@@ -108,7 +108,7 @@ public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
     kills.setActiveTotal(Arrays.stream(corpLeaderboardKillsTestData)
                                .filter(x -> x[1] == StatAttribute.TOTAL)
                                .map(x -> {
-                                 GetFwLeaderboardsCorporationsActiveTotal stat = new GetFwLeaderboardsCorporationsActiveTotal();
+                                 GetFwLeaderboardsCorporationsActiveTotalActiveTotal stat = new GetFwLeaderboardsCorporationsActiveTotalActiveTotal();
                                  stat.setCorporationId((Integer) x[0]);
                                  stat.setAmount((Integer) x[2]);
                                  return stat;
@@ -117,7 +117,7 @@ public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
     kills.setLastWeek(Arrays.stream(corpLeaderboardKillsTestData)
                             .filter(x -> x[1] == StatAttribute.LAST_WEEK)
                             .map(x -> {
-                              GetFwLeaderboardsCorporationsLastWeek stat = new GetFwLeaderboardsCorporationsLastWeek();
+                              GetFwLeaderboardsCorporationsLastWeekLastWeek stat = new GetFwLeaderboardsCorporationsLastWeekLastWeek();
                               stat.setCorporationId((Integer) x[0]);
                               stat.setAmount((Integer) x[2]);
                               return stat;
@@ -126,7 +126,7 @@ public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
     kills.setYesterday(Arrays.stream(corpLeaderboardKillsTestData)
                              .filter(x -> x[1] == StatAttribute.YESTERDAY)
                              .map(x -> {
-                               GetFwLeaderboardsCorporationsYesterday stat = new GetFwLeaderboardsCorporationsYesterday();
+                               GetFwLeaderboardsCorporationsYesterdayYesterday stat = new GetFwLeaderboardsCorporationsYesterdayYesterday();
                                stat.setCorporationId((Integer) x[0]);
                                stat.setAmount((Integer) x[2]);
                                return stat;
@@ -136,7 +136,7 @@ public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
     vps.setActiveTotal(Arrays.stream(corpLeaderboardVPsTestData)
                              .filter(x -> x[1] == StatAttribute.TOTAL)
                              .map(x -> {
-                               GetFwLeaderboardsCorporationsActiveTotal1 stat = new GetFwLeaderboardsCorporationsActiveTotal1();
+                               GetFwLeaderboardsCorporationsActiveTotalActiveTotal1 stat = new GetFwLeaderboardsCorporationsActiveTotalActiveTotal1();
                                stat.setCorporationId((Integer) x[0]);
                                stat.setAmount((Integer) x[2]);
                                return stat;
@@ -145,7 +145,7 @@ public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
     vps.setLastWeek(Arrays.stream(corpLeaderboardVPsTestData)
                           .filter(x -> x[1] == StatAttribute.LAST_WEEK)
                           .map(x -> {
-                            GetFwLeaderboardsCorporationsLastWeek1 stat = new GetFwLeaderboardsCorporationsLastWeek1();
+                            GetFwLeaderboardsCorporationsLastWeekLastWeek1 stat = new GetFwLeaderboardsCorporationsLastWeekLastWeek1();
                             stat.setCorporationId((Integer) x[0]);
                             stat.setAmount((Integer) x[2]);
                             return stat;
@@ -154,7 +154,7 @@ public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
     vps.setYesterday(Arrays.stream(corpLeaderboardVPsTestData)
                            .filter(x -> x[1] == StatAttribute.YESTERDAY)
                            .map(x -> {
-                             GetFwLeaderboardsCorporationsYesterday1 stat = new GetFwLeaderboardsCorporationsYesterday1();
+                             GetFwLeaderboardsCorporationsYesterdayYesterday1 stat = new GetFwLeaderboardsCorporationsYesterdayYesterday1();
                              stat.setCorporationId((Integer) x[0]);
                              stat.setAmount((Integer) x[2]);
                              return stat;

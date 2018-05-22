@@ -85,16 +85,16 @@ public class ESIFacWarCorporationLeaderboardSync extends AbstractESIRefSync<GetF
     List<CorporationKillStat> allKills = new ArrayList<>();
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getActiveTotal(), StatAttribute.TOTAL,
-                                        GetFwLeaderboardsCorporationsActiveTotal::getCorporationId,
-                                        GetFwLeaderboardsCorporationsActiveTotal::getAmount));
+                                        GetFwLeaderboardsCorporationsActiveTotalActiveTotal::getCorporationId,
+                                        GetFwLeaderboardsCorporationsActiveTotalActiveTotal::getAmount));
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getLastWeek(), StatAttribute.LAST_WEEK,
-                                        GetFwLeaderboardsCorporationsLastWeek::getCorporationId,
-                                        GetFwLeaderboardsCorporationsLastWeek::getAmount));
+                                        GetFwLeaderboardsCorporationsLastWeekLastWeek::getCorporationId,
+                                        GetFwLeaderboardsCorporationsLastWeekLastWeek::getAmount));
     allKills.addAll(produceKillStatList(serverData.getKills()
                                                   .getYesterday(), StatAttribute.YESTERDAY,
-                                        GetFwLeaderboardsCorporationsYesterday::getCorporationId,
-                                        GetFwLeaderboardsCorporationsYesterday::getAmount));
+                                        GetFwLeaderboardsCorporationsYesterdayYesterday::getCorporationId,
+                                        GetFwLeaderboardsCorporationsYesterdayYesterday::getAmount));
     for (CorporationKillStat next : allKills) {
       seenCorporationKills.add(Pair.of(next.getAttribute(), next.getCorporationID()));
     }
@@ -104,16 +104,16 @@ public class ESIFacWarCorporationLeaderboardSync extends AbstractESIRefSync<GetF
     List<CorporationVictoryPointStat> allVPs = new ArrayList<>();
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getActiveTotal(), StatAttribute.TOTAL,
-                                    GetFwLeaderboardsCorporationsActiveTotal1::getCorporationId,
-                                    GetFwLeaderboardsCorporationsActiveTotal1::getAmount));
+                                    GetFwLeaderboardsCorporationsActiveTotalActiveTotal1::getCorporationId,
+                                    GetFwLeaderboardsCorporationsActiveTotalActiveTotal1::getAmount));
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getLastWeek(), StatAttribute.LAST_WEEK,
-                                    GetFwLeaderboardsCorporationsLastWeek1::getCorporationId,
-                                    GetFwLeaderboardsCorporationsLastWeek1::getAmount));
+                                    GetFwLeaderboardsCorporationsLastWeekLastWeek1::getCorporationId,
+                                    GetFwLeaderboardsCorporationsLastWeekLastWeek1::getAmount));
     allVPs.addAll(produceVPStatList(serverData.getVictoryPoints()
                                               .getYesterday(), StatAttribute.YESTERDAY,
-                                    GetFwLeaderboardsCorporationsYesterday1::getCorporationId,
-                                    GetFwLeaderboardsCorporationsYesterday1::getAmount));
+                                    GetFwLeaderboardsCorporationsYesterdayYesterday1::getCorporationId,
+                                    GetFwLeaderboardsCorporationsYesterdayYesterday1::getAmount));
     for (CorporationVictoryPointStat next : allVPs) {
       seenCorporationVPs.add(Pair.of(next.getAttribute(), next.getCorporationID()));
     }
