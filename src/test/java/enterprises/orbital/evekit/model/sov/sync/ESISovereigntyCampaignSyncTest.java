@@ -144,7 +144,7 @@ public class ESISovereigntyCampaignSyncTest extends RefTestBase {
 
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
     ApiResponse<List<GetSovereigntyCampaigns200Ok>> campaignListResponse = new ApiResponse<>(200, headers, campaignList);
-    EasyMock.expect(mockEndpoint.getSovereigntyCampaignsWithHttpInfo(null, null, null, null)).andReturn(campaignListResponse);
+    EasyMock.expect(mockEndpoint.getSovereigntyCampaignsWithHttpInfo(null, null)).andReturn(campaignListResponse);
 
     // Finally, setup client provider mock
     mockServer = EasyMock.createMock(ESIRefClientProvider.class);

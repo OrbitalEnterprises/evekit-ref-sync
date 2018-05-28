@@ -33,7 +33,7 @@ public class ESIServerStatusSync extends AbstractESIRefSync<GetStatusOk> {
   protected ESIRefServerResult<GetStatusOk> getServerData(ESIRefClientProvider cp) throws ApiException, IOException {
     StatusApi apiInstance = cp.getStatusApi();
     ESIRefThrottle.throttle(endpoint().name());
-    ApiResponse<GetStatusOk> result = apiInstance.getStatusWithHttpInfo(null, null, null, null);
+    ApiResponse<GetStatusOk> result = apiInstance.getStatusWithHttpInfo(null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
   }

@@ -127,7 +127,7 @@ public class ESIAllianceSyncTest extends RefTestBase {
     }
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
     ApiResponse<List<Integer>> allianceListResponse = new ApiResponse<>(200, headers, allianceList);
-    EasyMock.expect(mockEndpoint.getAlliancesWithHttpInfo(null, null, null, null))
+    EasyMock.expect(mockEndpoint.getAlliancesWithHttpInfo(null, null))
             .andReturn(allianceListResponse);
 
     // Setup calls to request individual alliance info
@@ -142,7 +142,7 @@ public class ESIAllianceSyncTest extends RefTestBase {
       allianceData.setCreatorCorporationId((Integer) testData[6]);
       allianceData.setFactionId((Integer) testData[7]);
       ApiResponse<GetAlliancesAllianceIdOk> nextAllianceResponse = new ApiResponse<>(200, headers, allianceData);
-      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdWithHttpInfo(allianceID, null, null, null, null))
+      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdWithHttpInfo(allianceID, null, null))
               .andReturn(nextAllianceResponse);
     }
 
@@ -153,7 +153,7 @@ public class ESIAllianceSyncTest extends RefTestBase {
       iconData.setPx64x64((String) allianceIconTestData[i][1]);
       iconData.setPx128x128((String) allianceIconTestData[i][2]);
       ApiResponse<GetAlliancesAllianceIdIconsOk> nextIconResponse = new ApiResponse<>(200, headers, iconData);
-      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdIconsWithHttpInfo(allianceID, null, null, null, null))
+      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdIconsWithHttpInfo(allianceID, null, null))
               .andReturn(nextIconResponse);
     }
 
@@ -167,7 +167,7 @@ public class ESIAllianceSyncTest extends RefTestBase {
         }
       }
       ApiResponse<List<Integer>> nextCorpResponse = new ApiResponse<>(200, headers, corpList);
-      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdCorporationsWithHttpInfo(allianceID, null, null, null, null))
+      EasyMock.expect(mockEndpoint.getAlliancesAllianceIdCorporationsWithHttpInfo(allianceID, null, null))
               .andReturn(nextCorpResponse);
     }
 

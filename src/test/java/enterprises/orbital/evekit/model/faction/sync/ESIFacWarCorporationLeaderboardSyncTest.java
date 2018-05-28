@@ -164,7 +164,7 @@ public class ESIFacWarCorporationLeaderboardSyncTest extends RefTestBase {
     // Setup call
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
     ApiResponse<GetFwLeaderboardsCorporationsOk> corpLeaderboardsResponse = new ApiResponse<>(200, headers, corpLeaderboard);
-    EasyMock.expect(mockEndpoint.getFwLeaderboardsCorporationsWithHttpInfo(null, null, null, null))
+    EasyMock.expect(mockEndpoint.getFwLeaderboardsCorporationsWithHttpInfo(null, null))
             .andReturn(corpLeaderboardsResponse);
 
     // Finally, setup client provider mock

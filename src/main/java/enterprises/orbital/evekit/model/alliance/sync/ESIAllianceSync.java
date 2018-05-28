@@ -96,7 +96,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
     // Retrieve alliance list
     log.fine(getContext() + " retrieving alliance list");
     ESIRefThrottle.throttle(endpoint().name());
-    ApiResponse<List<Integer>> resultAllianceList = apiInstance.getAlliancesWithHttpInfo(null, null, null, null);
+    ApiResponse<List<Integer>> resultAllianceList = apiInstance.getAlliancesWithHttpInfo(null, null);
     checkCommonProblems(resultAllianceList);
     // Hard code expiry to six minutes in the future so that we properly cycle through all the alliances
     long expiry = OrbitalProperties.getCurrentTime() + TimeUnit.MILLISECONDS.convert(6, TimeUnit.MINUTES);
@@ -146,7 +146,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
             try {
               ESIRefThrottle.throttle(endpoint().name());
               ApiResponse<GetAlliancesAllianceIdOk> resultAlliance = apiInstance.getAlliancesAllianceIdWithHttpInfo(
-                  nextAlliance, null, null, null, null);
+                  nextAlliance, null, null);
               checkCommonProblems(resultAlliance);
               return resultAlliance.getData();
             } catch (ApiException e) {
@@ -162,7 +162,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
             try {
               ESIRefThrottle.throttle(endpoint().name());
               ApiResponse<GetAlliancesAllianceIdIconsOk> resultIcons = apiInstance.getAlliancesAllianceIdIconsWithHttpInfo(
-                  nextAlliance, null, null, null, null);
+                  nextAlliance, null, null);
               checkCommonProblems(resultIcons);
               return resultIcons.getData();
             } catch (ApiException e) {
@@ -178,7 +178,7 @@ public class ESIAllianceSync extends AbstractESIRefSync<ESIAllianceSync.Alliance
             try {
               ESIRefThrottle.throttle(endpoint().name());
               ApiResponse<List<Integer>> resultCorpList = apiInstance.getAlliancesAllianceIdCorporationsWithHttpInfo(
-                  nextAlliance, null, null, null, null);
+                  nextAlliance, null, null);
               checkCommonProblems(resultCorpList);
               return resultCorpList.getData();
             } catch (ApiException e) {

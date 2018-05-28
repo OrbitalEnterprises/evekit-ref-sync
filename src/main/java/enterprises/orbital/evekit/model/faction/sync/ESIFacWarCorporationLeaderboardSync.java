@@ -47,7 +47,7 @@ public class ESIFacWarCorporationLeaderboardSync extends AbstractESIRefSync<GetF
       ESIRefClientProvider cp) throws ApiException, IOException {
     FactionWarfareApi apiInstance = cp.getFactionWarfareApi();
     ESIRefThrottle.throttle(endpoint().name());
-    ApiResponse<GetFwLeaderboardsCorporationsOk> result = apiInstance.getFwLeaderboardsCorporationsWithHttpInfo(null, null, null, null);
+    ApiResponse<GetFwLeaderboardsCorporationsOk> result = apiInstance.getFwLeaderboardsCorporationsWithHttpInfo(null, null);
     checkCommonProblems(result);
     return new ESIRefServerResult<>(extractExpiry(result, OrbitalProperties.getCurrentTime() + maxDelay()), result.getData());
   }

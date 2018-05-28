@@ -110,7 +110,7 @@ public class ESIFacWarStatsSyncTest extends RefTestBase {
     }
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
     ApiResponse<List<GetFwStats200Ok>> factionStatsListResponse = new ApiResponse<>(200, headers, factionStatsList);
-    EasyMock.expect(mockEndpoint.getFwStatsWithHttpInfo(null, null, null, null))
+    EasyMock.expect(mockEndpoint.getFwStatsWithHttpInfo(null, null))
             .andReturn(factionStatsListResponse);
 
     // Finally, setup client provider mock
