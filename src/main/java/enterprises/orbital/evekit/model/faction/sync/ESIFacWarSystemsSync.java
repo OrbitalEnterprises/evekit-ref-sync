@@ -49,7 +49,12 @@ public class ESIFacWarSystemsSync extends AbstractESIRefSync<List<GetFwSystems20
     // Create updates for all entries
     Set<Integer> seenSystems = new HashSet<>();
     for (GetFwSystems200Ok next : serverData) {
-      updates.add(new FactionWarSystem(next.getOccupierFactionId(), next.getOwnerFactionId(), next.getSolarSystemId(), next.getVictoryPoints(), next.getVictoryPointsThreshold(), next.getContested()));
+      updates.add(new FactionWarSystem(next.getOccupierFactionId(),
+                                       next.getOwnerFactionId(),
+                                       next.getSolarSystemId(),
+                                       next.getVictoryPoints(),
+                                       next.getVictoryPointsThreshold(),
+                                       next.getContested().toString()));
       seenSystems.add(next.getSolarSystemId());
     }
     // Look for any systems not contained in the update and schedule for EOL

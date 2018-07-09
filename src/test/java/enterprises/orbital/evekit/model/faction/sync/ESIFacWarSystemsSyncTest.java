@@ -36,16 +36,17 @@ public class ESIFacWarSystemsSyncTest extends RefTestBase {
     // 2 int solarSystemID;
     // 3 int victoryPoints;
     // 4 int victoryPointsThreshold;
-    // 5 boolean contested;
+    // 5 GetFwSystems200Ok.ContestedEnum contested;
     int size = 20 + TestBase.getRandomInt(20);
     factionWarSystemsTestData = new Object[size][6];
+    int facWarContestedCount = GetFwSystems200Ok.ContestedEnum.values().length;
     for (int i = 0; i < size; i++) {
       factionWarSystemsTestData[i][0] = TestBase.getRandomInt();
       factionWarSystemsTestData[i][1] = TestBase.getRandomInt();
       factionWarSystemsTestData[i][2] = TestBase.getUniqueRandomInteger();
       factionWarSystemsTestData[i][3] = TestBase.getRandomInt();
       factionWarSystemsTestData[i][4] = TestBase.getRandomInt();
-      factionWarSystemsTestData[i][5] = TestBase.getRandomBoolean();
+      factionWarSystemsTestData[i][5] = GetFwSystems200Ok.ContestedEnum.values()[TestBase.getRandomInt(facWarContestedCount)];
     }
   }
 
@@ -90,7 +91,7 @@ public class ESIFacWarSystemsSyncTest extends RefTestBase {
       next.setSolarSystemId((Integer) factionData[2]);
       next.setVictoryPoints((Integer) factionData[3]);
       next.setVictoryPointsThreshold((Integer) factionData[4]);
-      next.setContested((Boolean) factionData[5]);
+      next.setContested((GetFwSystems200Ok.ContestedEnum) factionData[5]);
       factionSystemsList.add(next);
     }
     Map<String, List<String>> headers = createHeaders("Expires", "Thu, 21 Dec 2017 12:00:00 GMT");
@@ -121,7 +122,7 @@ public class ESIFacWarSystemsSyncTest extends RefTestBase {
       Assert.assertEquals((int) (Integer) factionWarSystemsTestData[i][2], nextSystem.getSolarSystemID());
       Assert.assertEquals((int) (Integer) factionWarSystemsTestData[i][3], nextSystem.getVictoryPoints());
       Assert.assertEquals((int) (Integer) factionWarSystemsTestData[i][4], nextSystem.getVictoryPointsThreshold());
-      Assert.assertEquals(factionWarSystemsTestData[i][5], nextSystem.isContested());
+      Assert.assertEquals(String.valueOf(factionWarSystemsTestData[i][5]), nextSystem.getContested());
     }
   }
 
@@ -175,7 +176,7 @@ public class ESIFacWarSystemsSyncTest extends RefTestBase {
                                                         modifiedSystemIDs[i],
                                                         (Integer) factionWarSystemsTestData[i][3] + 1,
                                                         (Integer) factionWarSystemsTestData[i][4] + 1,
-                                                        !((Boolean) factionWarSystemsTestData[i][5]));
+                                                        String.valueOf(factionWarSystemsTestData[i][5]));
       newSystem.setup(testTime - 1);
       RefCachedData.update(newSystem);
     }
@@ -201,7 +202,7 @@ public class ESIFacWarSystemsSyncTest extends RefTestBase {
       Assert.assertEquals((Integer) factionWarSystemsTestData[i][1] + 1, nextSystem.getOwningFactionID());
       Assert.assertEquals((Integer) factionWarSystemsTestData[i][3] + 1, nextSystem.getVictoryPoints());
       Assert.assertEquals((Integer) factionWarSystemsTestData[i][4] + 1, nextSystem.getVictoryPointsThreshold());
-      Assert.assertEquals(!((Boolean) factionWarSystemsTestData[i][5]), nextSystem.isContested());
+      Assert.assertEquals(String.valueOf(factionWarSystemsTestData[i][5]), nextSystem.getContested());
     }
 
     // Verify updates which will also verify that all old alliances were properly end of lifed
